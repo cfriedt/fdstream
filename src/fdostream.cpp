@@ -33,8 +33,8 @@ using namespace ::com::github::cfriedt;
 
 fdostream::fdostream( int fd, size_t buffer_size, bool auto_close )
 :
-	std::ios( 0 ),
-	std::ostream( & buf ),
+	ios( 0 ),
+	ostream( & buf ),
 	fdstream( auto_close ),
 	buf( fd, buffer_size )
 {

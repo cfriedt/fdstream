@@ -52,14 +52,6 @@ fdistreambuf::fdistreambuf( int fd, size_t buffer_size, size_t put_back )
 }
 
 fdistreambuf::~fdistreambuf() {
-	if ( -1 != sv[ 0 ] ) {
-		::close( sv[ 0 ] );
-		sv[ 0 ] = -1;
-	}
-	if ( -1 != sv[ 1 ] ) {
-		::close( sv[ 1 ] );
-		sv[ 1 ] = -1;
-	}
 }
 
 std::streambuf::int_type fdistreambuf::underflow() {
@@ -124,6 +116,13 @@ rethrow:
 }
 
 fdistreambuf & fdistreambuf::operator=( const fdistreambuf & other ) {
+	char_type *front;
+	char_type *ofront;
+
+	char_type *oeback;
+	char_type *ogptr;
+	char_type *oegptr;
+
 	if ( & other == this ) {
 		goto out;
 	}
@@ -131,6 +130,20 @@ fdistreambuf & fdistreambuf::operator=( const fdistreambuf & other ) {
 	fd = other.fd;
 	*( (size_t *) & put_back ) = other.put_back;
 
+	buffer.clear();
+	buffer.insert( std::end( buffer ), std::begin( other.buffer ), std::end( other.buffer ) );
+
+	// XXX: FIXME: copy the contents of the other buffer, and determine proper offsets with
+	// setg(). Use this and other's eback(), gptr() and egptr()
+
+	front = &buffer.front();
+	ofront = (char_type *) &other.buffer.front();
+
+	oeback = other.eback();
+	ogptr = other.gptr();
+	oegptr = other.egptr();
+
+	setg( front + ( oeback - ofront ), front + ( ogptr - ofront ), front + ( oegptr - ofront ) );
 
 out:
 	return *this;

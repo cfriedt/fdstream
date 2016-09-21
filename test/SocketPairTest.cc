@@ -23,7 +23,6 @@
  */
 
 #include <cstdio>
-#include <chrono>
 #include <thread>
 
 #include <errno.h>
@@ -31,8 +30,7 @@
 
 #include <gtest/gtest.h>
 
-#include "cfriedt/fdistream.h"
-#include "cfriedt/fdostream.h"
+#include "cfriedt/fdstream.h"
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
@@ -85,18 +83,47 @@ static void interrupt_test( SocketPairTest *spt ) {
 	spt->os.interrupt();
 }
 
-TEST_F( SocketPairTest, InterruptAfterOneSecond ) {
+TEST_F( SocketPairTest, PassMessage ) {
 
 	std::string tx_msg = "Hi there!";
+	char rx_msg_buf[ 64 ];
 	std::string rx_msg;
+
+	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
 
 	std::thread th( interrupt_test, this );
 
 	try {
 		os << tx_msg;
-		is >> rx_msg;
+		os.flush();
+		is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
+		rx_msg = std::string( rx_msg_buf );
+
+		EXPECT_EQ( tx_msg, rx_msg );
 
 	} catch( ... ) {
+		EXPECT_EQ( true, false );
+	}
+
+	th.join();
+}
+
+TEST_F( SocketPairTest, PassBinary ) {
+
+	uint16_t tx_msg = 0x7e57;
+	uint16_t rx_msg;
+
+	std::thread th( interrupt_test, this );
+
+	try {
+		os << tx_msg;
+		os.flush();
+		is >> rx_msg;
+
+		EXPECT_EQ( tx_msg, rx_msg );
+
+	} catch( ... ) {
+		EXPECT_EQ( true, false );
 	}
 
 	th.join();

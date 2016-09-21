@@ -74,6 +74,10 @@ fdostreambuf::int_type fdostreambuf::overflow( int_type ch ) {
 		goto out;
 	}
 
+//	if ( -1 == sync() ) {
+//		goto out;
+//	}
+
 	*pptr() = ch;
 	pbump( 1 );
 
@@ -140,12 +144,32 @@ rethrow:
 }
 
 fdostreambuf & fdostreambuf::operator=( const fdostreambuf & other ) {
+
+	char_type *base;
+	char_type *obase;
+
+	char_type *opptr;
+	char_type *oepptr;
+
 	if ( & other == this ) {
 		goto out;
 	}
 
 	fd = other.fd;
 
+	buffer.clear();
+
+	// XXX: FIXME: copy the contents of the other buffer, and determine proper offsets with
+	// setp(). Use this and other's pbase(), pptr() and epptr()
+	buffer.insert( std::end( buffer ), std::begin( other.buffer ), std::end( other.buffer ) );
+
+	base = &buffer.front();
+	obase = (char_type *) &other.buffer.front();
+
+	opptr = other.pptr();
+	oepptr = other.epptr();
+
+	setp( base + (opptr - obase), base + (oepptr - obase) - 1 );
 
 out:
 	return *this;

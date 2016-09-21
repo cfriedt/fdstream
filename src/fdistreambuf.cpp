@@ -30,7 +30,6 @@
 #include <sys/select.h>
 
 #include "cfriedt/fdstreambuf.h"
-#include "cfriedt/fdistreambuf.h"
 
 using std::size_t;
 

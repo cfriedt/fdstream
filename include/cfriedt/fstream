@@ -8,225 +8,72 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef _LIBCPP_FSTREAM
-#define _LIBCPP_FSTREAM
+#ifndef com_github_cfriedt_fstream_
+#define com_github_cfriedt_fstream_
 
-/*
-    fstream synopsis
-
-template <class charT, class traits = char_traits<charT> >
-class basic_filebuf
-    : public basic_streambuf<charT, traits>
-{
-public:
-    typedef charT                          char_type;
-    typedef traits                         traits_type;
-    typedef typename traits_type::int_type int_type;
-    typedef typename traits_type::pos_type pos_type;
-    typedef typename traits_type::off_type off_type;
-
-    // 27.9.1.2 Constructors/destructor:
-    basic_filebuf();
-    basic_filebuf(basic_filebuf&& rhs);
-    virtual ~basic_filebuf();
-
-    // 27.9.1.3 Assign/swap:
-    basic_filebuf& operator=(basic_filebuf&& rhs);
-    void swap(basic_filebuf& rhs);
-
-    // 27.9.1.4 Members:
-    bool is_open() const;
-    basic_filebuf* open(const char* s, ios_base::openmode mode);
-    basic_filebuf* open(const string& s, ios_base::openmode mode);
-    basic_filebuf* close();
-
-protected:
-    // 27.9.1.5 Overridden virtual functions:
-    virtual streamsize showmanyc();
-    virtual int_type underflow();
-    virtual int_type uflow();
-    virtual int_type pbackfail(int_type c = traits_type::eof());
-    virtual int_type overflow (int_type c = traits_type::eof());
-    virtual basic_streambuf<char_type, traits_type>* setbuf(char_type* s, streamsize n);
-    virtual pos_type seekoff(off_type off, ios_base::seekdir way,
-                             ios_base::openmode which = ios_base::in | ios_base::out);
-    virtual pos_type seekpos(pos_type sp,
-                             ios_base::openmode which = ios_base::in | ios_base::out);
-    virtual int sync();
-    virtual void imbue(const locale& loc);
-};
-
-template <class charT, class traits>
-  void
-  swap(basic_filebuf<charT, traits>& x, basic_filebuf<charT, traits>& y);
-
-typedef basic_filebuf<char>    filebuf;
-typedef basic_filebuf<wchar_t> wfilebuf;
-
-template <class charT, class traits = char_traits<charT> >
-class basic_ifstream
-    : public basic_istream<charT,traits>
-{
-public:
-    typedef charT                          char_type;
-    typedef traits                         traits_type;
-    typedef typename traits_type::int_type int_type;
-    typedef typename traits_type::pos_type pos_type;
-    typedef typename traits_type::off_type off_type;
-
-    basic_ifstream();
-    explicit basic_ifstream(const char* s, ios_base::openmode mode = ios_base::in);
-    explicit basic_ifstream(const string& s, ios_base::openmode mode = ios_base::in);
-    basic_ifstream(basic_ifstream&& rhs);
-
-    basic_ifstream& operator=(basic_ifstream&& rhs);
-    void swap(basic_ifstream& rhs);
-
-    basic_filebuf<char_type, traits_type>* rdbuf() const;
-    bool is_open() const;
-    void open(const char* s, ios_base::openmode mode = ios_base::in);
-    void open(const string& s, ios_base::openmode mode = ios_base::in);
-    void close();
-};
-
-template <class charT, class traits>
-  void
-  swap(basic_ifstream<charT, traits>& x, basic_ifstream<charT, traits>& y);
-
-typedef basic_ifstream<char>    ifstream;
-typedef basic_ifstream<wchar_t> wifstream;
-
-template <class charT, class traits = char_traits<charT> >
-class basic_ofstream
-    : public basic_ostream<charT,traits>
-{
-public:
-    typedef charT                          char_type;
-    typedef traits                         traits_type;
-    typedef typename traits_type::int_type int_type;
-    typedef typename traits_type::pos_type pos_type;
-    typedef typename traits_type::off_type off_type;
-
-    basic_ofstream();
-    explicit basic_ofstream(const char* s, ios_base::openmode mode = ios_base::out);
-    explicit basic_ofstream(const string& s, ios_base::openmode mode = ios_base::out);
-    basic_ofstream(basic_ofstream&& rhs);
-
-    basic_ofstream& operator=(basic_ofstream&& rhs);
-    void swap(basic_ofstream& rhs);
-
-    basic_filebuf<char_type, traits_type>* rdbuf() const;
-    bool is_open() const;
-    void open(const char* s, ios_base::openmode mode = ios_base::out);
-    void open(const string& s, ios_base::openmode mode = ios_base::out);
-    void close();
-};
-
-template <class charT, class traits>
-  void
-  swap(basic_ofstream<charT, traits>& x, basic_ofstream<charT, traits>& y);
-
-typedef basic_ofstream<char>    ofstream;
-typedef basic_ofstream<wchar_t> wofstream;
-
-template <class charT, class traits=char_traits<charT> >
-class basic_fstream
-    : public basic_iostream<charT,traits>
-{
-public:
-    typedef charT                          char_type;
-    typedef traits                         traits_type;
-    typedef typename traits_type::int_type int_type;
-    typedef typename traits_type::pos_type pos_type;
-    typedef typename traits_type::off_type off_type;
-
-    basic_fstream();
-    explicit basic_fstream(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out);
-    explicit basic_fstream(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out);
-    basic_fstream(basic_fstream&& rhs);
-
-    basic_fstream& operator=(basic_fstream&& rhs);
-    void swap(basic_fstream& rhs);
-
-    basic_filebuf<char_type, traits_type>* rdbuf() const;
-    bool is_open() const;
-    void open(const char* s, ios_base::openmode mode = ios_base::in|ios_base::out);
-    void open(const string& s, ios_base::openmode mode = ios_base::in|ios_base::out);
-    void close();
-};
-
-template <class charT, class traits>
-  void swap(basic_fstream<charT, traits>& x, basic_fstream<charT, traits>& y);
-
-typedef basic_fstream<char>    fstream;
-typedef basic_fstream<wchar_t> wfstream;
-
-}  // std
-
-*/
-
-#include <__config>
+//#include <__config>
 #include <ostream>
 #include <istream>
-#include <__locale>
+//#include <__locale>
 #include <cstdio>
 
-#include <__undef_min_max>
+//#include <__undef_min_max>
 
-#if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
-#pragma GCC system_header
-#endif
+//_LIBCPP_BEGIN_NAMESPACE_STD
 
-_LIBCPP_BEGIN_NAMESPACE_STD
+namespace com {
+namespace github {
+namespace cfriedt {
 
-template <class _CharT, class _Traits>
-class _LIBCPP_TYPE_VIS_ONLY basic_filebuf
-    : public basic_streambuf<_CharT, _Traits>
+
+class filebuf
+    : public std::streambuf
 {
 public:
-    typedef _CharT                           char_type;
-    typedef _Traits                          traits_type;
-    typedef typename traits_type::int_type   int_type;
-    typedef typename traits_type::pos_type   pos_type;
-    typedef typename traits_type::off_type   off_type;
-    typedef typename traits_type::state_type state_type;
+//    typedef _CharT                           char_type;
+//    typedef _Traits                          traits_type;
+//    typedef typename traits_type::int_type   int_type;
+//    typedef typename traits_type::pos_type   pos_type;
+//    typedef typename traits_type::off_type   off_type;
+//    typedef typename traits_type::state_type state_type;
 
     // 27.9.1.2 Constructors/destructor:
-    basic_filebuf();
+    filebuf();
+    filebuf( int fd, std::ios_base::openmode mode );
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
-    basic_filebuf(basic_filebuf&& __rhs);
+    filebuf(filebuf&& __rhs);
 #endif
-    virtual ~basic_filebuf();
+    virtual ~filebuf();
 
     // 27.9.1.3 Assign/swap:
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
     _LIBCPP_INLINE_VISIBILITY
-    basic_filebuf& operator=(basic_filebuf&& __rhs);
+    filebuf& operator=(filebuf&& __rhs);
 #endif
-    void swap(basic_filebuf& __rhs);
+    void swap(filebuf& __rhs);
 
     // 27.9.1.4 Members:
     _LIBCPP_INLINE_VISIBILITY
     bool is_open() const;
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-    basic_filebuf* open(const char* __s, ios_base::openmode __mode);
+    filebuf* open(const char* __s, std::ios_base::openmode __mode);
     _LIBCPP_INLINE_VISIBILITY
-    basic_filebuf* open(const string& __s, ios_base::openmode __mode);
+    filebuf* open(const std::string& __s, std::ios_base::openmode __mode);
 #endif
-    basic_filebuf* close();
+    filebuf* close();
 
 protected:
     // 27.9.1.5 Overridden virtual functions:
     virtual int_type underflow();
     virtual int_type pbackfail(int_type __c = traits_type::eof());
     virtual int_type overflow (int_type __c = traits_type::eof());
-    virtual basic_streambuf<char_type, traits_type>* setbuf(char_type* __s, streamsize __n);
-    virtual pos_type seekoff(off_type __off, ios_base::seekdir __way,
-                             ios_base::openmode __wch = ios_base::in | ios_base::out);
+    virtual basic_streambuf* setbuf(char_type* __s, std::streamsize __n);
+    virtual pos_type seekoff(off_type __off, std::ios_base::seekdir __way,
+                             std::ios_base::openmode __wch = std::ios_base::in | std::ios_base::out);
     virtual pos_type seekpos(pos_type __sp,
-                             ios_base::openmode __wch = ios_base::in | ios_base::out);
+                             std::ios_base::openmode __wch = std::ios_base::in | std::ios_base::out);
     virtual int sync();
-    virtual void imbue(const locale& __loc);
+    virtual void imbue(const std::locale& __loc);
 
 private:
     char*       __extbuf_;
@@ -237,11 +84,11 @@ private:
     char_type* __intbuf_;
     size_t __ibs_;
     FILE* __file_;
-    const codecvt<char_type, char, state_type>* __cv_;
+    const std::codecvt<char_type, char, traits_type::state_type state_type>* __cv_;
     state_type __st_;
     state_type __st_last_;
-    ios_base::openmode __om_;
-    ios_base::openmode __cm_;
+    std::ios_base::openmode __om_;
+    std::ios_base::openmode __cm_;
     bool __owns_eb_;
     bool __owns_ib_;
     bool __always_noconv_;
@@ -250,8 +97,8 @@ private:
     void __write_mode();
 };
 
-template <class _CharT, class _Traits>
-basic_filebuf<_CharT, _Traits>::basic_filebuf()
+
+filebuf::filebuf()
     : __extbuf_(0),
       __extbufnext_(0),
       __extbufend_(0),
@@ -268,19 +115,19 @@ basic_filebuf<_CharT, _Traits>::basic_filebuf()
       __owns_ib_(false),
       __always_noconv_(false)
 {
-    if (has_facet<codecvt<char_type, char, state_type> >(this->getloc()))
-    {
-        __cv_ = &use_facet<codecvt<char_type, char, state_type> >(this->getloc());
-        __always_noconv_ = __cv_->always_noconv();
-    }
+//    if (has_facet<codecvt<char_type, char, state_type> >(this->getloc()))
+//    {
+//        __cv_ = &use_facet<codecvt<char_type, char, state_type> >(this->getloc());
+//        __always_noconv_ = __cv_->always_noconv();
+//    }
     setbuf(0, 4096);
 }
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
 
-template <class _CharT, class _Traits>
-basic_filebuf<_CharT, _Traits>::basic_filebuf(basic_filebuf&& __rhs)
-    : basic_streambuf<_CharT, _Traits>(__rhs)
+
+filebuf::filebuf(filebuf&& __rhs)
+    : std::streambuf(__rhs)
 {
     if (__rhs.__extbuf_ == __rhs.__extbuf_min_)
     {
@@ -332,8 +179,8 @@ basic_filebuf<_CharT, _Traits>::basic_filebuf(basic_filebuf&& __rhs)
     __rhs.__intbuf_ = 0;
     __rhs.__ibs_ = 0;
     __rhs.__file_ = 0;
-    __rhs.__st_ = state_type();
-    __rhs.__st_last_ = state_type();
+    __rhs.__st_ = std::streambuf::state_type();
+    __rhs.__st_last_ = std::streambuf::state_type();
     __rhs.__om_ = 0;
     __rhs.__cm_ = 0;
     __rhs.__owns_eb_ = false;
@@ -342,10 +189,10 @@ basic_filebuf<_CharT, _Traits>::basic_filebuf(basic_filebuf&& __rhs)
     __rhs.setp(0, 0);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_filebuf<_CharT, _Traits>&
-basic_filebuf<_CharT, _Traits>::operator=(basic_filebuf&& __rhs)
+filebuf&
+filebuf::operator=(filebuf&& __rhs)
 {
     close();
     swap(__rhs);
@@ -354,8 +201,8 @@ basic_filebuf<_CharT, _Traits>::operator=(basic_filebuf&& __rhs)
 
 #endif  // _LIBCPP_HAS_NO_RVALUE_REFERENCES
 
-template <class _CharT, class _Traits>
-basic_filebuf<_CharT, _Traits>::~basic_filebuf()
+
+filebuf::~filebuf()
 {
 #ifndef _LIBCPP_NO_EXCEPTIONS
     try
@@ -374,11 +221,11 @@ basic_filebuf<_CharT, _Traits>::~basic_filebuf()
         delete [] __intbuf_;
 }
 
-template <class _CharT, class _Traits>
+
 void
-basic_filebuf<_CharT, _Traits>::swap(basic_filebuf& __rhs)
+filebuf::swap(filebuf& __rhs)
 {
-    basic_streambuf<char_type, traits_type>::swap(__rhs);
+    basic_streambuf::swap(__rhs);
     if (__extbuf_ != __extbuf_min_ && __rhs.__extbuf_ != __rhs.__extbuf_min_)
     {
         _VSTD::swap(__extbuf_, __rhs.__extbuf_);
@@ -452,74 +299,74 @@ basic_filebuf<_CharT, _Traits>::swap(basic_filebuf& __rhs)
     }
 }
 
-template <class _CharT, class _Traits>
+
 inline _LIBCPP_INLINE_VISIBILITY
 void
-swap(basic_filebuf<_CharT, _Traits>& __x, basic_filebuf<_CharT, _Traits>& __y)
+swap(filebuf& __x, filebuf& __y)
 {
     __x.swap(__y);
 }
 
-template <class _CharT, class _Traits>
+
 inline
 bool
-basic_filebuf<_CharT, _Traits>::is_open() const
+filebuf::is_open() const
 {
     return __file_ != 0;
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-template <class _CharT, class _Traits>
-basic_filebuf<_CharT, _Traits>*
-basic_filebuf<_CharT, _Traits>::open(const char* __s, ios_base::openmode __mode)
+
+filebuf*
+filebuf::open(const char* __s, std::ios_base::openmode __mode)
 {
-    basic_filebuf<_CharT, _Traits>* __rt = 0;
+    filebuf* __rt = 0;
     if (__file_ == 0)
     {
         __rt = this;
         const char* __mdstr;
-        switch (__mode & ~ios_base::ate)
+        switch (__mode & ~std::ios_base::ate)
         {
-        case ios_base::out:
-        case ios_base::out | ios_base::trunc:
+        case std::ios_base::out:
+        case std::ios_base::out | std::ios_base::trunc:
             __mdstr = "w";
             break;
-        case ios_base::out | ios_base::app:
-        case ios_base::app:
+        case std::ios_base::out | std::ios_base::app:
+        case std::ios_base::app:
             __mdstr = "a";
             break;
-        case ios_base::in:
+        case std::ios_base::in:
             __mdstr = "r";
             break;
-        case ios_base::in | ios_base::out:
+        case std::ios_base::in | std::ios_base::out:
             __mdstr = "r+";
             break;
-        case ios_base::in | ios_base::out | ios_base::trunc:
+        case std::ios_base::in | std::ios_base::out | std::ios_base::trunc:
             __mdstr = "w+";
             break;
-        case ios_base::in | ios_base::out | ios_base::app:
-        case ios_base::in | ios_base::app:
+        case std::ios_base::in | std::ios_base::out | std::ios_base::app:
+        case std::ios_base::in | std::ios_base::app:
             __mdstr = "a+";
             break;
-        case ios_base::out | ios_base::binary:
-        case ios_base::out | ios_base::trunc | ios_base::binary:
+        case std::ios_base::out | std::ios_base::binary:
+        case std::ios_base::out | std::ios_base::trunc | std::ios_base::binary:
             __mdstr = "wb";
             break;
-        case ios_base::out | ios_base::app | ios_base::binary:
-        case ios_base::app | ios_base::binary:
+        case std::ios_base::out | std::ios_base::app | std::ios_base::binary:
+        case std::ios_base::app | std::ios_base::binary:
             __mdstr = "ab";
             break;
-        case ios_base::in | ios_base::binary:
+        case std::ios_base::in | std::ios_base::binary:
             __mdstr = "rb";
             break;
-        case ios_base::in | ios_base::out | ios_base::binary:
+        case std::ios_base::in | std::ios_base::out | std::ios_base::binary:
             __mdstr = "r+b";
             break;
-        case ios_base::in | ios_base::out | ios_base::trunc | ios_base::binary:
+        case std::ios_base::in | std::ios_base::out | std::ios_base::trunc | std::ios_base::binary:
             __mdstr = "w+b";
             break;
-        case ios_base::in | ios_base::out | ios_base::app | ios_base::binary:
-        case ios_base::in | ios_base::app | ios_base::binary:
+        case std::ios_base::in | std::ios_base::out | std::ios_base::app | std::ios_base::binary:
+        case std::ios_base::in | std::ios_base::app | std::ios_base::binary:
             __mdstr = "a+b";
             break;
         default:
@@ -532,7 +379,7 @@ basic_filebuf<_CharT, _Traits>::open(const char* __s, ios_base::openmode __mode)
             if (__file_)
             {
                 __om_ = __mode;
-                if (__mode & ios_base::ate)
+                if (__mode & std::ios_base::ate)
                 {
                     if (fseek(__file_, 0, SEEK_END))
                     {
@@ -549,24 +396,24 @@ basic_filebuf<_CharT, _Traits>::open(const char* __s, ios_base::openmode __mode)
     return __rt;
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_filebuf<_CharT, _Traits>*
-basic_filebuf<_CharT, _Traits>::open(const string& __s, ios_base::openmode __mode)
+filebuf*
+filebuf::open(const std::string& __s, std::ios_base::openmode __mode)
 {
     return open(__s.c_str(), __mode);
 }
 #endif
 
-template <class _CharT, class _Traits>
-basic_filebuf<_CharT, _Traits>*
-basic_filebuf<_CharT, _Traits>::close()
+
+filebuf*
+filebuf::close()
 {
-    basic_filebuf<_CharT, _Traits>* __rt = 0;
+    filebuf* __rt = 0;
     if (__file_)
     {
         __rt = this;
-        unique_ptr<FILE, int(*)(FILE*)> __h(__file_, fclose);
+        std::unique_ptr<FILE, int(*)(FILE*)> __h(__file_, fclose);
         if (sync())
             __rt = 0;
         if (fclose(__h.release()) == 0)
@@ -577,9 +424,9 @@ basic_filebuf<_CharT, _Traits>::close()
     return __rt;
 }
 
-template <class _CharT, class _Traits>
-typename basic_filebuf<_CharT, _Traits>::int_type
-basic_filebuf<_CharT, _Traits>::underflow()
+
+typename filebuf::int_type
+filebuf::underflow()
 {
     if (__file_ == 0)
         return traits_type::eof();
@@ -587,7 +434,7 @@ basic_filebuf<_CharT, _Traits>::underflow()
     char_type __1buf;
     if (this->gptr() == 0)
         this->setg(&__1buf, &__1buf+1, &__1buf+1);
-    const size_t __unget_sz = __initial ? 0 : min<size_t>((this->egptr() - this->eback()) / 2, 4);
+    const size_t __unget_sz = __initial ? 0 : std::min<size_t>((this->egptr() - this->eback()) / 2, 4);
     int_type __c = traits_type::eof();
     if (this->gptr() == this->egptr())
     {
@@ -613,20 +460,22 @@ basic_filebuf<_CharT, _Traits>::underflow()
             __extbufend_ = __extbuf_ + (__extbuf_ == __extbuf_min_ ? sizeof(__extbuf_min_) : __ebs_);
             size_t __nmemb = _VSTD::min(static_cast<size_t>(__ibs_ - __unget_sz),
                                  static_cast<size_t>(__extbufend_ - __extbufnext_));
-            codecvt_base::result __r;
+            std::codecvt_base::result __r;
             __st_last_ = __st_;
             size_t __nr = fread((void*)__extbufnext_, 1, __nmemb, __file_);
             if (__nr != 0)
             {
-                if (!__cv_)
-                    __throw_bad_cast();
+                if (!__cv_) {
+                    //__throw_bad_cast();
+                	throw std::exception();
+                }
 
                 __extbufend_ = __extbufnext_ + __nr;
                 char_type*  __inext;
                 __r = __cv_->in(__st_, __extbuf_, __extbufend_, __extbufnext_,
                                        this->eback() + __unget_sz,
                                        this->eback() + __ibs_, __inext);
-                if (__r == codecvt_base::noconv)
+                if (__r == std::codecvt_base::noconv)
                 {
                     this->setg((char_type*)__extbuf_, (char_type*)__extbuf_, (char_type*)__extbufend_);
                     __c = traits_type::to_int_type(*this->gptr());
@@ -646,9 +495,9 @@ basic_filebuf<_CharT, _Traits>::underflow()
     return __c;
 }
 
-template <class _CharT, class _Traits>
-typename basic_filebuf<_CharT, _Traits>::int_type
-basic_filebuf<_CharT, _Traits>::pbackfail(int_type __c)
+
+typename filebuf::int_type
+filebuf::pbackfail(int_type __c)
 {
     if (__file_ && this->eback() < this->gptr())
     {
@@ -657,7 +506,7 @@ basic_filebuf<_CharT, _Traits>::pbackfail(int_type __c)
             this->gbump(-1);
             return traits_type::not_eof(__c);
         }
-        if ((__om_ & ios_base::out) ||
+        if ((__om_ & std::ios_base::out) ||
             traits_type::eq(traits_type::to_char_type(__c), this->gptr()[-1]))
         {
             this->gbump(-1);
@@ -668,9 +517,9 @@ basic_filebuf<_CharT, _Traits>::pbackfail(int_type __c)
     return traits_type::eof();
 }
 
-template <class _CharT, class _Traits>
-typename basic_filebuf<_CharT, _Traits>::int_type
-basic_filebuf<_CharT, _Traits>::overflow(int_type __c)
+
+typename filebuf::int_type
+filebuf::overflow(int_type __c)
 {
     if (__file_ == 0)
         return traits_type::eof();
@@ -696,29 +545,31 @@ basic_filebuf<_CharT, _Traits>::overflow(int_type __c)
         else
         {
             char* __extbe = __extbuf_;
-            codecvt_base::result __r;
+            std::codecvt_base::result __r;
             do
             {
-                if (!__cv_)
-                    __throw_bad_cast();
+                if (!__cv_) {
+                    //__throw_bad_cast();
+                	throw std::exception();
+                }
 
                 const char_type* __e;
                 __r = __cv_->out(__st_, this->pbase(), this->pptr(), __e,
                                         __extbuf_, __extbuf_ + __ebs_, __extbe);
                 if (__e == this->pbase())
                     return traits_type::eof();
-                if (__r == codecvt_base::noconv)
+                if (__r == std::codecvt_base::noconv)
                 {
                     size_t __nmemb = static_cast<size_t>(this->pptr() - this->pbase());
                     if (fwrite(this->pbase(), 1, __nmemb, __file_) != __nmemb)
                         return traits_type::eof();
                 }
-                else if (__r == codecvt_base::ok || __r == codecvt_base::partial)
+                else if (__r == std::codecvt_base::ok || __r == std::codecvt_base::partial)
                 {
                     size_t __nmemb = static_cast<size_t>(__extbe - __extbuf_);
                     if (fwrite(__extbuf_, 1, __nmemb, __file_) != __nmemb)
                         return traits_type::eof();
-                    if (__r == codecvt_base::partial)
+                    if (__r == std::codecvt_base::partial)
                     {
                         this->setp((char_type*)__e, this->pptr());
                         this->pbump(this->epptr() - this->pbase());
@@ -726,16 +577,16 @@ basic_filebuf<_CharT, _Traits>::overflow(int_type __c)
                 }
                 else
                     return traits_type::eof();
-            } while (__r == codecvt_base::partial);
+            } while (__r == std::codecvt_base::partial);
         }
         this->setp(__pb_save, __epb_save);
     }
     return traits_type::not_eof(__c);
 }
 
-template <class _CharT, class _Traits>
-basic_streambuf<_CharT, _Traits>*
-basic_filebuf<_CharT, _Traits>::setbuf(char_type* __s, streamsize __n)
+
+std::streambuf*
+filebuf::setbuf(char_type* __s, std::streamsize __n)
 {
     this->setg(0, 0, 0);
     this->setp(0, 0);
@@ -765,7 +616,7 @@ basic_filebuf<_CharT, _Traits>::setbuf(char_type* __s, streamsize __n)
     }
     if (!__always_noconv_)
     {
-        __ibs_ = max<streamsize>(__n, sizeof(__extbuf_min_));
+        __ibs_ = std::max<std::streamsize>(__n, sizeof(__extbuf_min_));
         if (__s && __ibs_ >= sizeof(__extbuf_min_))
         {
             __intbuf_ = __s;
@@ -786,13 +637,15 @@ basic_filebuf<_CharT, _Traits>::setbuf(char_type* __s, streamsize __n)
     return this;
 }
 
-template <class _CharT, class _Traits>
-typename basic_filebuf<_CharT, _Traits>::pos_type
-basic_filebuf<_CharT, _Traits>::seekoff(off_type __off, ios_base::seekdir __way,
-                                        ios_base::openmode)
+
+typename filebuf::pos_type
+filebuf::seekoff(off_type __off, std::ios_base::seekdir __way,
+                                        std::ios_base::openmode)
 {
-    if (!__cv_)
-        __throw_bad_cast();
+    if (!__cv_) {
+        //__throw_bad_cast();
+    	throw std::exception();
+    }
 
     int __width = __cv_->encoding();
     if (__file_ == 0 || (__width <= 0 && __off != 0) || sync())
@@ -801,13 +654,13 @@ basic_filebuf<_CharT, _Traits>::seekoff(off_type __off, ios_base::seekdir __way,
     int __whence;
     switch (__way)
     {
-    case ios_base::beg:
+    case std::ios_base::beg:
         __whence = SEEK_SET;
         break;
-    case ios_base::cur:
+    case std::ios_base::cur:
         __whence = SEEK_CUR;
         break;
-    case ios_base::end:
+    case std::ios_base::end:
         __whence = SEEK_END;
         break;
     default:
@@ -826,9 +679,9 @@ basic_filebuf<_CharT, _Traits>::seekoff(off_type __off, ios_base::seekdir __way,
     return __r;
 }
 
-template <class _CharT, class _Traits>
-typename basic_filebuf<_CharT, _Traits>::pos_type
-basic_filebuf<_CharT, _Traits>::seekpos(pos_type __sp, ios_base::openmode)
+
+typename filebuf::pos_type
+filebuf::seekpos(pos_type __sp, std::ios_base::openmode)
 {
     if (__file_ == 0 || sync())
         return pos_type(off_type(-1));
@@ -843,21 +696,23 @@ basic_filebuf<_CharT, _Traits>::seekpos(pos_type __sp, ios_base::openmode)
     return __sp;
 }
 
-template <class _CharT, class _Traits>
+
 int
-basic_filebuf<_CharT, _Traits>::sync()
+filebuf::sync()
 {
     if (__file_ == 0)
         return 0;
-    if (!__cv_)
-        __throw_bad_cast();
+    if (!__cv_) {
+        // __throw_bad_cast();
+    	throw std::exception();
+    }
 
-    if (__cm_ & ios_base::out)
+    if (__cm_ & std::ios_base::out)
     {
         if (this->pptr() != this->pbase())
             if (overflow() == traits_type::eof())
                 return -1;
-        codecvt_base::result __r;
+        std::codecvt_base::result __r;
         do
         {
             char* __extbe;
@@ -865,13 +720,13 @@ basic_filebuf<_CharT, _Traits>::sync()
             size_t __nmemb = static_cast<size_t>(__extbe - __extbuf_);
             if (fwrite(__extbuf_, 1, __nmemb, __file_) != __nmemb)
                 return -1;
-        } while (__r == codecvt_base::partial);
-        if (__r == codecvt_base::error)
+        } while (__r == std::codecvt_base::partial);
+        if (__r == std::codecvt_base::error)
             return -1;
         if (fflush(__file_))
             return -1;
     }
-    else if (__cm_ & ios_base::in)
+    else if (__cm_ & std::ios_base::in)
     {
         off_type __c;
         state_type __state = __st_last_;
@@ -912,12 +767,12 @@ basic_filebuf<_CharT, _Traits>::sync()
     return 0;
 }
 
-template <class _CharT, class _Traits>
+
 void
-basic_filebuf<_CharT, _Traits>::imbue(const locale& __loc)
+filebuf::imbue(const std::locale& __loc)
 {
     sync();
-    __cv_ = &use_facet<codecvt<char_type, char, state_type> >(__loc);
+    __cv_ = &std::use_facet<std::codecvt<char_type, char, state_type> >(__loc);
     bool __old_anc = __always_noconv_;
     __always_noconv_ = __cv_->always_noconv();
     if (__old_anc != __always_noconv_)
@@ -956,11 +811,11 @@ basic_filebuf<_CharT, _Traits>::imbue(const locale& __loc)
     }
 }
 
-template <class _CharT, class _Traits>
+
 bool
-basic_filebuf<_CharT, _Traits>::__read_mode()
+filebuf::__read_mode()
 {
-    if (!(__cm_ & ios_base::in))
+    if (!(__cm_ & std::ios_base::in))
     {
         this->setp(0, 0);
         if (__always_noconv_)
@@ -969,17 +824,17 @@ basic_filebuf<_CharT, _Traits>::__read_mode()
                        (char_type*)__extbuf_ + __ebs_);
         else
             this->setg(__intbuf_, __intbuf_ + __ibs_, __intbuf_ + __ibs_);
-        __cm_ = ios_base::in;
+        __cm_ = std::ios_base::in;
         return true;
     }
     return false;
 }
 
-template <class _CharT, class _Traits>
+
 void
-basic_filebuf<_CharT, _Traits>::__write_mode()
+filebuf::__write_mode()
 {
-    if (!(__cm_ & ios_base::out))
+    if (!(__cm_ & std::ios_base::out))
     {
         this->setg(0, 0, 0);
         if (__ebs_ > sizeof(__extbuf_min_))
@@ -992,401 +847,401 @@ basic_filebuf<_CharT, _Traits>::__write_mode()
         }
         else
             this->setp(0, 0);
-        __cm_ = ios_base::out;
+        __cm_ = std::ios_base::out;
     }
 }
 
-// basic_ifstream
+// ifstream
 
-template <class _CharT, class _Traits>
-class _LIBCPP_TYPE_VIS_ONLY basic_ifstream
-    : public basic_istream<_CharT, _Traits>
+
+class ifstream
+    : public std::istream
 {
 public:
-    typedef _CharT                         char_type;
-    typedef _Traits                        traits_type;
-    typedef typename traits_type::int_type int_type;
-    typedef typename traits_type::pos_type pos_type;
-    typedef typename traits_type::off_type off_type;
+//    typedef _CharT                         char_type;
+//    typedef _Traits                        traits_type;
+//    typedef typename traits_type::int_type int_type;
+//    typedef typename traits_type::pos_type pos_type;
+//    typedef typename traits_type::off_type off_type;
 
     _LIBCPP_INLINE_VISIBILITY
-    basic_ifstream();
+    ifstream();
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
     _LIBCPP_INLINE_VISIBILITY
-    explicit basic_ifstream(const char* __s, ios_base::openmode __mode = ios_base::in);
+    explicit ifstream(const char* __s, std::ios_base::openmode __mode = std::ios_base::in);
     _LIBCPP_INLINE_VISIBILITY
-    explicit basic_ifstream(const string& __s, ios_base::openmode __mode = ios_base::in);
+    explicit ifstream(const std::string& __s, std::ios_base::openmode __mode = std::ios_base::in);
 #endif
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
     _LIBCPP_INLINE_VISIBILITY
-    basic_ifstream(basic_ifstream&& __rhs);
+    ifstream(ifstream&& __rhs);
 #endif
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
     _LIBCPP_INLINE_VISIBILITY
-    basic_ifstream& operator=(basic_ifstream&& __rhs);
+    ifstream& operator=(ifstream&& __rhs);
 #endif
     _LIBCPP_INLINE_VISIBILITY
-    void swap(basic_ifstream& __rhs);
+    void swap(ifstream& __rhs);
 
     _LIBCPP_INLINE_VISIBILITY
-    basic_filebuf<char_type, traits_type>* rdbuf() const;
+    filebuf* rdbuf() const;
     _LIBCPP_INLINE_VISIBILITY
     bool is_open() const;
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-    void open(const char* __s, ios_base::openmode __mode = ios_base::in);
-    void open(const string& __s, ios_base::openmode __mode = ios_base::in);
+    void open(const char* __s, std::ios_base::openmode __mode = std::ios_base::in);
+    void open(const std::string& __s, std::ios_base::openmode __mode = std::ios_base::in);
 #endif
     _LIBCPP_INLINE_VISIBILITY
     void close();
 
 private:
-    basic_filebuf<char_type, traits_type> __sb_;
+    filebuf __sb_;
 };
 
-template <class _CharT, class _Traits>
+
 inline
-basic_ifstream<_CharT, _Traits>::basic_ifstream()
-    : basic_istream<char_type, traits_type>(&__sb_)
+ifstream::ifstream()
+    : std::istream(&__sb_)
 {
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-template <class _CharT, class _Traits>
+
 inline
-basic_ifstream<_CharT, _Traits>::basic_ifstream(const char* __s, ios_base::openmode __mode)
-    : basic_istream<char_type, traits_type>(&__sb_)
+ifstream::ifstream(const char* __s, std::ios_base::openmode __mode)
+	: std::istream(&__sb_)
 {
-    if (__sb_.open(__s, __mode | ios_base::in) == 0)
+    if (__sb_.open(__s, __mode | std::ios_base::in) == 0)
         this->setstate(ios_base::failbit);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_ifstream<_CharT, _Traits>::basic_ifstream(const string& __s, ios_base::openmode __mode)
-    : basic_istream<char_type, traits_type>(&__sb_)
+ifstream::ifstream(const std::string& __s, std::ios_base::openmode __mode)
+    : std::istream(&__sb_)
 {
-    if (__sb_.open(__s, __mode | ios_base::in) == 0)
+    if (__sb_.open(__s, __mode | std::ios_base::in) == 0)
         this->setstate(ios_base::failbit);
 }
 #endif
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
 
-template <class _CharT, class _Traits>
+
 inline
-basic_ifstream<_CharT, _Traits>::basic_ifstream(basic_ifstream&& __rhs)
-    : basic_istream<char_type, traits_type>(_VSTD::move(__rhs)),
+ifstream::ifstream(ifstream&& __rhs)
+    : std::istream(_VSTD::move(__rhs)),
       __sb_(_VSTD::move(__rhs.__sb_))
 {
     this->set_rdbuf(&__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_ifstream<_CharT, _Traits>&
-basic_ifstream<_CharT, _Traits>::operator=(basic_ifstream&& __rhs)
+ifstream&
+ifstream::operator=(ifstream&& __rhs)
 {
-    basic_istream<char_type, traits_type>::operator=(_VSTD::move(__rhs));
+    std::istream::operator=(_VSTD::move(__rhs));
     __sb_ = _VSTD::move(__rhs.__sb_);
     return *this;
 }
 
 #endif  // _LIBCPP_HAS_NO_RVALUE_REFERENCES
 
-template <class _CharT, class _Traits>
+
 inline
 void
-basic_ifstream<_CharT, _Traits>::swap(basic_ifstream& __rhs)
+ifstream::swap(ifstream& __rhs)
 {
-    basic_istream<char_type, traits_type>::swap(__rhs);
+    std::istream::swap(__rhs);
     __sb_.swap(__rhs.__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline _LIBCPP_INLINE_VISIBILITY
 void
-swap(basic_ifstream<_CharT, _Traits>& __x, basic_ifstream<_CharT, _Traits>& __y)
+swap(ifstream& __x, ifstream& __y)
 {
     __x.swap(__y);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_filebuf<_CharT, _Traits>*
-basic_ifstream<_CharT, _Traits>::rdbuf() const
+filebuf*
+ifstream::rdbuf() const
 {
-    return const_cast<basic_filebuf<char_type, traits_type>*>(&__sb_);
+    return const_cast<filebuf*>(&__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline
 bool
-basic_ifstream<_CharT, _Traits>::is_open() const
+ifstream::is_open() const
 {
     return __sb_.is_open();
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-template <class _CharT, class _Traits>
+
 void
-basic_ifstream<_CharT, _Traits>::open(const char* __s, ios_base::openmode __mode)
+ifstream::open(const char* __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode | ios_base::in))
+    if (__sb_.open(__s, __mode | std::ios_base::in))
         this->clear();
     else
         this->setstate(ios_base::failbit);
 }
 
-template <class _CharT, class _Traits>
+
 void
-basic_ifstream<_CharT, _Traits>::open(const string& __s, ios_base::openmode __mode)
+ifstream::open(const std::string& __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode | ios_base::in))
+    if (__sb_.open(__s, __mode | std::ios_base::in))
         this->clear();
     else
         this->setstate(ios_base::failbit);
 }
 #endif
 
-template <class _CharT, class _Traits>
+
 inline
 void
-basic_ifstream<_CharT, _Traits>::close()
+ifstream::close()
 {
     if (__sb_.close() == 0)
         this->setstate(ios_base::failbit);
 }
 
-// basic_ofstream
+// ofstream
 
-template <class _CharT, class _Traits>
-class _LIBCPP_TYPE_VIS_ONLY basic_ofstream
-    : public basic_ostream<_CharT, _Traits>
+
+class ofstream
+    : public std::ostream
 {
 public:
-    typedef _CharT                         char_type;
-    typedef _Traits                        traits_type;
-    typedef typename traits_type::int_type int_type;
-    typedef typename traits_type::pos_type pos_type;
-    typedef typename traits_type::off_type off_type;
+//    typedef _CharT                         char_type;
+//    typedef _Traits                        traits_type;
+//    typedef typename traits_type::int_type int_type;
+//    typedef typename traits_type::pos_type pos_type;
+//    typedef typename traits_type::off_type off_type;
 
     _LIBCPP_INLINE_VISIBILITY
-    basic_ofstream();
+    ofstream();
     _LIBCPP_INLINE_VISIBILITY
-    explicit basic_ofstream(const char* __s, ios_base::openmode __mode = ios_base::out);
+    explicit ofstream(const char* __s, std::ios_base::openmode __mode = std::ios_base::out);
     _LIBCPP_INLINE_VISIBILITY
-    explicit basic_ofstream(const string& __s, ios_base::openmode __mode = ios_base::out);
+    explicit ofstream(const std::string& __s, std::ios_base::openmode __mode = std::ios_base::out);
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
     _LIBCPP_INLINE_VISIBILITY
-    basic_ofstream(basic_ofstream&& __rhs);
+    ofstream(ofstream&& __rhs);
 #endif
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
     _LIBCPP_INLINE_VISIBILITY
-    basic_ofstream& operator=(basic_ofstream&& __rhs);
+    ofstream& operator=(ofstream&& __rhs);
 #endif
     _LIBCPP_INLINE_VISIBILITY
-    void swap(basic_ofstream& __rhs);
+    void swap(ofstream& __rhs);
 
     _LIBCPP_INLINE_VISIBILITY
-    basic_filebuf<char_type, traits_type>* rdbuf() const;
+    filebuf* rdbuf() const;
     _LIBCPP_INLINE_VISIBILITY
     bool is_open() const;
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-    void open(const char* __s, ios_base::openmode __mode = ios_base::out);
-    void open(const string& __s, ios_base::openmode __mode = ios_base::out);
+    void open(const char* __s, std::ios_base::openmode __mode = std::ios_base::out);
+    void open(const std::string& __s, std::ios_base::openmode __mode = std::ios_base::out);
 #endif
     _LIBCPP_INLINE_VISIBILITY
     void close();
 
 private:
-    basic_filebuf<char_type, traits_type> __sb_;
+    filebuf __sb_;
 };
 
-template <class _CharT, class _Traits>
+
 inline
-basic_ofstream<_CharT, _Traits>::basic_ofstream()
-    : basic_ostream<char_type, traits_type>(&__sb_)
+ofstream::ofstream()
+    : std::ostream(&__sb_)
 {
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-template <class _CharT, class _Traits>
+
 inline
-basic_ofstream<_CharT, _Traits>::basic_ofstream(const char* __s, ios_base::openmode __mode)
-    : basic_ostream<char_type, traits_type>(&__sb_)
+ofstream::ofstream(const char* __s, std::ios_base::openmode __mode)
+    : std::ostream(&__sb_)
 {
-    if (__sb_.open(__s, __mode | ios_base::out) == 0)
+    if (__sb_.open(__s, __mode | std::ios_base::out) == 0)
         this->setstate(ios_base::failbit);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_ofstream<_CharT, _Traits>::basic_ofstream(const string& __s, ios_base::openmode __mode)
-    : basic_ostream<char_type, traits_type>(&__sb_)
+ofstream::ofstream(const std::string& __s, std::ios_base::openmode __mode)
+    : std::ostream(&__sb_)
 {
-    if (__sb_.open(__s, __mode | ios_base::out) == 0)
+    if (__sb_.open(__s, __mode | std::ios_base::out) == 0)
         this->setstate(ios_base::failbit);
 }
 #endif
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
 
-template <class _CharT, class _Traits>
+
 inline
-basic_ofstream<_CharT, _Traits>::basic_ofstream(basic_ofstream&& __rhs)
-    : basic_ostream<char_type, traits_type>(_VSTD::move(__rhs)),
+ofstream::ofstream(ofstream&& __rhs)
+    : std::ostream(_VSTD::move(__rhs)),
       __sb_(_VSTD::move(__rhs.__sb_))
 {
     this->set_rdbuf(&__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_ofstream<_CharT, _Traits>&
-basic_ofstream<_CharT, _Traits>::operator=(basic_ofstream&& __rhs)
+ofstream&
+ofstream::operator=(ofstream&& __rhs)
 {
-    basic_ostream<char_type, traits_type>::operator=(_VSTD::move(__rhs));
+	std::ostream::operator=(_VSTD::move(__rhs));
     __sb_ = _VSTD::move(__rhs.__sb_);
     return *this;
 }
 
 #endif  // _LIBCPP_HAS_NO_RVALUE_REFERENCES
 
-template <class _CharT, class _Traits>
+
 inline
 void
-basic_ofstream<_CharT, _Traits>::swap(basic_ofstream& __rhs)
+ofstream::swap(ofstream& __rhs)
 {
-    basic_ostream<char_type, traits_type>::swap(__rhs);
+	std::ostream::swap(__rhs);
     __sb_.swap(__rhs.__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline _LIBCPP_INLINE_VISIBILITY
 void
-swap(basic_ofstream<_CharT, _Traits>& __x, basic_ofstream<_CharT, _Traits>& __y)
+swap(ofstream& __x, ofstream& __y)
 {
     __x.swap(__y);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_filebuf<_CharT, _Traits>*
-basic_ofstream<_CharT, _Traits>::rdbuf() const
+filebuf*
+ofstream::rdbuf() const
 {
-    return const_cast<basic_filebuf<char_type, traits_type>*>(&__sb_);
+    return const_cast<filebuf*>(&__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline
 bool
-basic_ofstream<_CharT, _Traits>::is_open() const
+ofstream::is_open() const
 {
     return __sb_.is_open();
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-template <class _CharT, class _Traits>
+
 void
-basic_ofstream<_CharT, _Traits>::open(const char* __s, ios_base::openmode __mode)
+ofstream::open(const char* __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode | ios_base::out))
+    if (__sb_.open(__s, __mode | std::ios_base::out))
         this->clear();
     else
         this->setstate(ios_base::failbit);
 }
 
-template <class _CharT, class _Traits>
+
 void
-basic_ofstream<_CharT, _Traits>::open(const string& __s, ios_base::openmode __mode)
+ofstream::open(const std::string& __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode | ios_base::out))
+    if (__sb_.open(__s, __mode | std::ios_base::out))
         this->clear();
     else
         this->setstate(ios_base::failbit);
 }
 #endif
 
-template <class _CharT, class _Traits>
+
 inline
 void
-basic_ofstream<_CharT, _Traits>::close()
+ofstream::close()
 {
     if (__sb_.close() == 0)
         this->setstate(ios_base::failbit);
 }
 
-// basic_fstream
+// fstream
 
-template <class _CharT, class _Traits>
-class _LIBCPP_TYPE_VIS_ONLY basic_fstream
-    : public basic_iostream<_CharT, _Traits>
+
+class fstream
+    : public std::iostream
 {
 public:
-    typedef _CharT                         char_type;
-    typedef _Traits                        traits_type;
-    typedef typename traits_type::int_type int_type;
-    typedef typename traits_type::pos_type pos_type;
-    typedef typename traits_type::off_type off_type;
+//    typedef _CharT                         char_type;
+//    typedef _Traits                        traits_type;
+//    typedef typename traits_type::int_type int_type;
+//    typedef typename traits_type::pos_type pos_type;
+//    typedef typename traits_type::off_type off_type;
 
     _LIBCPP_INLINE_VISIBILITY
-    basic_fstream();
+    fstream();
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
     _LIBCPP_INLINE_VISIBILITY
-    explicit basic_fstream(const char* __s, ios_base::openmode __mode = ios_base::in | ios_base::out);
+    explicit fstream(const char* __s, std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out);
     _LIBCPP_INLINE_VISIBILITY
-    explicit basic_fstream(const string& __s, ios_base::openmode __mode = ios_base::in | ios_base::out);
+    explicit fstream(const std::string& __s, std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out);
 #endif
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
     _LIBCPP_INLINE_VISIBILITY
-    basic_fstream(basic_fstream&& __rhs);
+    fstream(fstream&& __rhs);
 #endif
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
     _LIBCPP_INLINE_VISIBILITY
-    basic_fstream& operator=(basic_fstream&& __rhs);
+    fstream& operator=(fstream&& __rhs);
 #endif
     _LIBCPP_INLINE_VISIBILITY
-    void swap(basic_fstream& __rhs);
+    void swap(fstream& __rhs);
 
     _LIBCPP_INLINE_VISIBILITY
-    basic_filebuf<char_type, traits_type>* rdbuf() const;
+    filebuf* rdbuf() const;
     _LIBCPP_INLINE_VISIBILITY
     bool is_open() const;
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-    void open(const char* __s, ios_base::openmode __mode = ios_base::in | ios_base::out);
-    void open(const string& __s, ios_base::openmode __mode = ios_base::in | ios_base::out);
+    void open(const char* __s, std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out);
+    void open(const std::string& __s, std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out);
 #endif
     _LIBCPP_INLINE_VISIBILITY
     void close();
 
 private:
-    basic_filebuf<char_type, traits_type> __sb_;
+    filebuf __sb_;
 };
 
-template <class _CharT, class _Traits>
+
 inline
-basic_fstream<_CharT, _Traits>::basic_fstream()
-    : basic_iostream<char_type, traits_type>(&__sb_)
+fstream::fstream()
+    : std::iostream(&__sb_)
 {
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-template <class _CharT, class _Traits>
+
 inline
-basic_fstream<_CharT, _Traits>::basic_fstream(const char* __s, ios_base::openmode __mode)
-    : basic_iostream<char_type, traits_type>(&__sb_)
+fstream::fstream(const char* __s, std::ios_base::openmode __mode)
+    : std::iostream(&__sb_)
 {
     if (__sb_.open(__s, __mode) == 0)
         this->setstate(ios_base::failbit);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_fstream<_CharT, _Traits>::basic_fstream(const string& __s, ios_base::openmode __mode)
-    : basic_iostream<char_type, traits_type>(&__sb_)
+fstream::fstream(const std::string& __s, std::ios_base::openmode __mode)
+    : std::iostream(&__sb_)
 {
     if (__sb_.open(__s, __mode) == 0)
         this->setstate(ios_base::failbit);
@@ -1395,64 +1250,64 @@ basic_fstream<_CharT, _Traits>::basic_fstream(const string& __s, ios_base::openm
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
 
-template <class _CharT, class _Traits>
+
 inline
-basic_fstream<_CharT, _Traits>::basic_fstream(basic_fstream&& __rhs)
-    : basic_iostream<char_type, traits_type>(_VSTD::move(__rhs)),
+fstream::fstream(fstream&& __rhs)
+    : std::iostream(_VSTD::move(__rhs)),
       __sb_(_VSTD::move(__rhs.__sb_))
 {
     this->set_rdbuf(&__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_fstream<_CharT, _Traits>&
-basic_fstream<_CharT, _Traits>::operator=(basic_fstream&& __rhs)
+fstream&
+fstream::operator=(fstream&& __rhs)
 {
-    basic_iostream<char_type, traits_type>::operator=(_VSTD::move(__rhs));
+    std::iostream::operator=(_VSTD::move(__rhs));
     __sb_ = _VSTD::move(__rhs.__sb_);
     return *this;
 }
 
 #endif  // _LIBCPP_HAS_NO_RVALUE_REFERENCES
 
-template <class _CharT, class _Traits>
+
 inline
 void
-basic_fstream<_CharT, _Traits>::swap(basic_fstream& __rhs)
+fstream::swap(fstream& __rhs)
 {
-    basic_iostream<char_type, traits_type>::swap(__rhs);
+    std::iostream::swap(__rhs);
     __sb_.swap(__rhs.__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline _LIBCPP_INLINE_VISIBILITY
 void
-swap(basic_fstream<_CharT, _Traits>& __x, basic_fstream<_CharT, _Traits>& __y)
+swap(fstream& __x, fstream& __y)
 {
     __x.swap(__y);
 }
 
-template <class _CharT, class _Traits>
+
 inline
-basic_filebuf<_CharT, _Traits>*
-basic_fstream<_CharT, _Traits>::rdbuf() const
+filebuf*
+fstream::rdbuf() const
 {
-    return const_cast<basic_filebuf<char_type, traits_type>*>(&__sb_);
+    return const_cast<filebuf*>(&__sb_);
 }
 
-template <class _CharT, class _Traits>
+
 inline
 bool
-basic_fstream<_CharT, _Traits>::is_open() const
+fstream::is_open() const
 {
     return __sb_.is_open();
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
-template <class _CharT, class _Traits>
+
 void
-basic_fstream<_CharT, _Traits>::open(const char* __s, ios_base::openmode __mode)
+fstream::open(const char* __s, std::ios_base::openmode __mode)
 {
     if (__sb_.open(__s, __mode))
         this->clear();
@@ -1460,9 +1315,9 @@ basic_fstream<_CharT, _Traits>::open(const char* __s, ios_base::openmode __mode)
         this->setstate(ios_base::failbit);
 }
 
-template <class _CharT, class _Traits>
+
 void
-basic_fstream<_CharT, _Traits>::open(const string& __s, ios_base::openmode __mode)
+fstream::open(const std::string& __s, std::ios_base::openmode __mode)
 {
     if (__sb_.open(__s, __mode))
         this->clear();
@@ -1471,15 +1326,19 @@ basic_fstream<_CharT, _Traits>::open(const string& __s, ios_base::openmode __mod
 }
 #endif
 
-template <class _CharT, class _Traits>
+
 inline
 void
-basic_fstream<_CharT, _Traits>::close()
+fstream::close()
 {
     if (__sb_.close() == 0)
         this->setstate(ios_base::failbit);
 }
 
-_LIBCPP_END_NAMESPACE_STD
+//_LIBCPP_END_NAMESPACE_STD
 
-#endif  // _LIBCPP_FSTREAM
+}
+}
+} // com.github.cfriedt
+
+#endif  // com_github_cfriedt_fstream_

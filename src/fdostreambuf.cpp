@@ -41,7 +41,7 @@ using namespace ::com::github::cfriedt;
 
 fdostreambuf::fdostreambuf( int fd, size_t buffer_size )
 :
-	fdstreambuf( fd, buffer_size )
+	fdstreambuf( fd, buffer_size, std::ios_base::binary )
 {
 
 	char_type *base;

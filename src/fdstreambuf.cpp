@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include "cfriedt/fstream"
 #include "cfriedt/fdstreambuf.h"
 
 #include <errno.h>
@@ -33,9 +34,10 @@ using ::std::size_t;
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdstreambuf::fdstreambuf( int fd, size_t buffer_size )
+fdstreambuf::fdstreambuf( int fd, std::size_t buffer_size, std::ios_base::openmode mode  )
 :
 	fd( fd ),
+	::com::github::cfriedt::filebuf( fd, mode ),
 	buffer( buffer_size )
 {
 	int r;

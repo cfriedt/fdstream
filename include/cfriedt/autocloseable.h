@@ -22,51 +22,43 @@
  * SOFTWARE.
  */
 
-#include <unistd.h>
+#ifndef com_github_cfriedt_autocloseable_h_
+#define com_github_cfriedt_autocloseable_h_
 
-#include "cfriedt/fdostream.h"
+namespace com {
+namespace github {
+namespace cfriedt {
 
-using std::size_t;
+class autocloseable {
 
-using namespace ::std;
-using namespace ::com::github::cfriedt;
-
-fdostream::fdostream( int fd, size_t buffer_size, bool auto_close )
-:
-	std::ios( 0 ),
-	std::ostream( & buf ),
-	fdstream( auto_close ),
-	buf( fd, buffer_size )
-{
-}
-
-fdostream::fdostream()
-:
-	fdostream( -1 )
-{
-}
-
-fdostream::~fdostream() {
-}
-
-fdstreambuf & fdostream::getBuf() {
-	return buf;
-}
-
-void fdostream::close() {
-	int fd;
-	fd = buf.getFd();
-	if ( -1 != fd ) {
-		::close( fd );
+public:
+	autocloseable( bool auto_close = false )
+	:
+		auto_close_( auto_close )
+	{
 	}
-}
-
-fdostream & fdostream::operator=( const fdostream & other ) {
-	if ( & other == this ) {
-		goto out;
+	virtual ~autocloseable() {
+		if ( auto_close_ ) {
+			close();
+		}
 	}
-	buf = other.buf;
-	rdbuf( (streambuf *) & buf );
-out:
-	return *this;
+
+	bool autoclose() {
+		return auto_close_;
+	}
+	void autoclose( bool auto_close ) {
+		auto_close_ = auto_close;
+	}
+
+protected:
+
+	virtual void close() {};
+
+	bool auto_close_;
+};
+
 }
+}
+} // com.github.cfriedt
+
+#endif /* com_github_cfriedt_autocloseable_h_ */

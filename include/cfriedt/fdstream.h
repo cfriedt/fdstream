@@ -22,51 +22,35 @@
  * SOFTWARE.
  */
 
-#include <unistd.h>
+#ifndef com_github_cfriedt_fdstream_h_
+#define com_github_cfriedt_fdstream_h_
 
+#include "cfriedt/autocloseable.h"
+#include "cfriedt/fdstreambuf.h"
+
+namespace com {
+namespace github {
+namespace cfriedt {
+
+class fdstream : public autocloseable {
+
+public:
+	fdstream( bool auto_close = false );
+	virtual ~fdstream() = 0;
+
+	void interrupt();
+
+protected:
+	virtual fdstreambuf &getBuf() = 0;
+	void close();
+
+};
+
+}
+}
+} // com.github.cfriedt
+
+#include "cfriedt/fdistream.h"
 #include "cfriedt/fdostream.h"
 
-using std::size_t;
-
-using namespace ::std;
-using namespace ::com::github::cfriedt;
-
-fdostream::fdostream( int fd, size_t buffer_size, bool auto_close )
-:
-	std::ios( 0 ),
-	std::ostream( & buf ),
-	fdstream( auto_close ),
-	buf( fd, buffer_size )
-{
-}
-
-fdostream::fdostream()
-:
-	fdostream( -1 )
-{
-}
-
-fdostream::~fdostream() {
-}
-
-fdstreambuf & fdostream::getBuf() {
-	return buf;
-}
-
-void fdostream::close() {
-	int fd;
-	fd = buf.getFd();
-	if ( -1 != fd ) {
-		::close( fd );
-	}
-}
-
-fdostream & fdostream::operator=( const fdostream & other ) {
-	if ( & other == this ) {
-		goto out;
-	}
-	buf = other.buf;
-	rdbuf( (streambuf *) & buf );
-out:
-	return *this;
-}
+#endif /* com_github_cfriedt_fdstream_h_ */

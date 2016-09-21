@@ -22,51 +22,82 @@
  * SOFTWARE.
  */
 
-#include <unistd.h>
+#include <cstdio>
+#include <chrono>
+#include <thread>
 
+#include <errno.h>
+#include <sys/socket.h>
+
+#include <gtest/gtest.h>
+
+#include "cfriedt/fdistream.h"
 #include "cfriedt/fdostream.h"
-
-using std::size_t;
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdostream::fdostream( int fd, size_t buffer_size, bool auto_close )
-:
-	std::ios( 0 ),
-	std::ostream( & buf ),
-	fdstream( auto_close ),
-	buf( fd, buffer_size )
+class SocketPairTest : public testing::Test {
+
+public:
+
+	enum {
+		CLIENT,
+		SERVER,
+	};
+
+	fdistream is;
+	fdostream os;
+	int sv[ 2 ];
+
+	SocketPairTest();
+	~SocketPairTest();
+
+	void SetUp();
+	void TearDown();
+};
+
+SocketPairTest::SocketPairTest()
 {
 }
 
-fdostream::fdostream()
-:
-	fdostream( -1 )
-{
+SocketPairTest::~SocketPairTest() {
 }
 
-fdostream::~fdostream() {
-}
+void SocketPairTest::SetUp() {
 
-fdstreambuf & fdostream::getBuf() {
-	return buf;
-}
-
-void fdostream::close() {
-	int fd;
-	fd = buf.getFd();
-	if ( -1 != fd ) {
-		::close( fd );
+	int r;
+	r = socketpair( AF_UNIX, SOCK_STREAM, 0, sv );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
 	}
+
+	os = fdostream( sv[ CLIENT ] );
+	is = fdistream( sv[ SERVER ] );
 }
 
-fdostream & fdostream::operator=( const fdostream & other ) {
-	if ( & other == this ) {
-		goto out;
+void SocketPairTest::TearDown() {
+}
+
+static void interrupt_test( SocketPairTest *spt ) {
+	::sleep( 1 );
+	spt->is.interrupt();
+	spt->os.interrupt();
+}
+
+TEST_F( SocketPairTest, InterruptAfterOneSecond ) {
+
+	std::string tx_msg = "Hi there!";
+	std::string rx_msg;
+
+	std::thread th( interrupt_test, this );
+
+	try {
+		os << tx_msg;
+		is >> rx_msg;
+
+	} catch( ... ) {
 	}
-	buf = other.buf;
-	rdbuf( (streambuf *) & buf );
-out:
-	return *this;
+
+	th.join();
 }

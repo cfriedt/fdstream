@@ -22,51 +22,32 @@
  * SOFTWARE.
  */
 
+#include "cfriedt/fdstream.h"
+
+#include <errno.h>
 #include <unistd.h>
-
-#include "cfriedt/fdostream.h"
-
-using std::size_t;
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdostream::fdostream( int fd, size_t buffer_size, bool auto_close )
+fdstream::fdstream( bool auto_close )
 :
-	std::ios( 0 ),
-	std::ostream( & buf ),
-	fdstream( auto_close ),
-	buf( fd, buffer_size )
+	autocloseable( auto_close )
 {
 }
 
-fdostream::fdostream()
-:
-	fdostream( -1 )
-{
+fdstream::~fdstream() {
 }
 
-fdostream::~fdostream() {
+fdstreambuf & fdstream::getBuf() {
+	errno = ENOSYS;
+	throw std::system_error( errno, std::system_category() );
 }
 
-fdstreambuf & fdostream::getBuf() {
-	return buf;
+void fdstream::interrupt() {
+	getBuf().interrupt();
 }
 
-void fdostream::close() {
-	int fd;
-	fd = buf.getFd();
-	if ( -1 != fd ) {
-		::close( fd );
-	}
-}
-
-fdostream & fdostream::operator=( const fdostream & other ) {
-	if ( & other == this ) {
-		goto out;
-	}
-	buf = other.buf;
-	rdbuf( (streambuf *) & buf );
-out:
-	return *this;
+void fdstream::close() {
+	::close( getBuf().getFd() );
 }

@@ -29,10 +29,11 @@ using std::size_t;
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdistream::fdistream( int fd, size_t buffer_size )
+fdistream::fdistream( int fd, size_t buffer_size, bool auto_close )
 :
 	std::ios( 0 ),
 	std::istream( & buf ),
+	fdstream( auto_close ),
 	buf( fd, buffer_size )
 {
 }
@@ -46,8 +47,8 @@ fdistream::fdistream()
 fdistream::~fdistream() {
 }
 
-void fdistream::interrupt() {
-	buf.interrupt();
+fdstreambuf & fdistream::getBuf() {
+	return buf;
 }
 
 fdistream & fdistream::operator=( const fdistream & other ) {

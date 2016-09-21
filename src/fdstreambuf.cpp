@@ -22,51 +22,49 @@
  * SOFTWARE.
  */
 
+#include "cfriedt/fdstreambuf.h"
+
+#include <errno.h>
 #include <unistd.h>
+#include <sys/socket.h>
 
-#include "cfriedt/fdostream.h"
-
-using std::size_t;
+using ::std::size_t;
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdostream::fdostream( int fd, size_t buffer_size, bool auto_close )
+fdstreambuf::fdstreambuf( int fd, size_t buffer_size )
 :
-	std::ios( 0 ),
-	std::ostream( & buf ),
-	fdstream( auto_close ),
-	buf( fd, buffer_size )
+	fd( fd ),
+	buffer( buffer_size )
 {
-}
-
-fdostream::fdostream()
-:
-	fdostream( -1 )
-{
-}
-
-fdostream::~fdostream() {
-}
-
-fdstreambuf & fdostream::getBuf() {
-	return buf;
-}
-
-void fdostream::close() {
-	int fd;
-	fd = buf.getFd();
-	if ( -1 != fd ) {
-		::close( fd );
+	int r;
+	r = ::socketpair( AF_UNIX, SOCK_STREAM, 0, sv );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
 	}
 }
 
-fdostream & fdostream::operator=( const fdostream & other ) {
-	if ( & other == this ) {
-		goto out;
+fdstreambuf::~fdstreambuf() {
+	for( int i = 0; i < 2; i++ ) {
+		if ( -1 != sv[ i ] ) {
+			::close( sv[ i ] );
+			sv[ i ] = -1;
+		}
 	}
-	buf = other.buf;
-	rdbuf( (streambuf *) & buf );
-out:
-	return *this;
 }
+
+void fdstreambuf::interrupt() {
+	int r;
+	const uint8_t x = '!';
+
+	r = ::write( sv[ fdstreambuf::INTERRUPTOR ], &x, sizeof( x ) );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+}
+
+int fdstreambuf::getFd() {
+	return fd;
+}
+

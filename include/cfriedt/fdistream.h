@@ -27,22 +27,24 @@
 
 #include <istream>
 
+#include "cfriedt/fdstream.h"
 #include "cfriedt/fdistreambuf.h"
 
 namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdistream : public std::istream {
+class fdistream : public std::istream, public fdstream {
 
 public:
 	fdistream();
-	fdistream( int fd, std::size_t buffer_size = 256 );
+	fdistream( int fd, std::size_t buffer_size = 256, bool auto_close = false );
 	virtual ~fdistream();
 
-	void interrupt();
-
 	fdistream &operator=( const fdistream & other );
+
+protected:
+	fdstreambuf &getBuf();
 
 private:
     // copy ctor and assignment not implemented;

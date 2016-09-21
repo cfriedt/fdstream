@@ -29,6 +29,7 @@
 #include <sys/socket.h>
 #include <sys/select.h>
 
+#include "cfriedt/fdstreambuf.h"
 #include "cfriedt/fdistreambuf.h"
 
 using std::size_t;
@@ -40,34 +41,24 @@ using namespace ::com::github::cfriedt;
 
 fdistreambuf::fdistreambuf( int fd, size_t buffer_size, size_t put_back )
 :
-	fd( fd ),
-	put_back( std::max( put_back, size_t( 1 ) ) ),
-	buffer( std::max( buffer_size, put_back ) + put_back )
+	fdstreambuf( fd, buffer_size ),
+	put_back( std::max( put_back, size_t( 1 ) ) )
 {
 
 	char_type *end;
-	int r;
 
 	end = &buffer.front() + buffer.size();
 	setg( end, end, end );
-
-	r = ::socketpair( AF_UNIX, SOCK_STREAM, 0, sv );
-	if ( -1 == r ) {
-		throw std::system_error( errno, std::system_category() );
-	}
 }
 
 fdistreambuf::~fdistreambuf() {
-	close_fds();
-}
-
-void fdistreambuf::interrupt() {
-	int r;
-	const uint8_t x = '!';
-
-	r = ::write( sv[ fdistreambuf::INTERRUPTOR ], &x, sizeof( x ) );
-	if ( -1 == r ) {
-		throw std::system_error( errno, std::system_category() );
+	if ( -1 != sv[ 0 ] ) {
+		::close( sv[ 0 ] );
+		sv[ 0 ] = -1;
+	}
+	if ( -1 != sv[ 1 ] ) {
+		::close( sv[ 1 ] );
+		sv[ 1 ] = -1;
 	}
 }
 
@@ -130,22 +121,6 @@ rethrow:
 	setg( base, start, start + r );
 
 	return traits_type::to_int_type( *gptr() );
-}
-
-void fdistreambuf::close_fds() {
-	// TODO: add another public method to set whether the fd is automatically closed
-//	if ( -1 != fd ) {
-//		::close( fd );
-//		fd = -1;
-//	}
-	if ( -1 != sv[ 0 ] ) {
-		::close( sv[ 0 ] );
-		sv[ 0 ] = -1;
-	}
-	if ( -1 != sv[ 1 ] ) {
-		::close( sv[ 1 ] );
-		sv[ 1 ] = -1;
-	}
 }
 
 fdistreambuf & fdistreambuf::operator=( const fdistreambuf & other ) {

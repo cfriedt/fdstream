@@ -27,22 +27,26 @@
 
 #include <ostream>
 
+#include "cfriedt/fdstream.h"
 #include "cfriedt/fdostreambuf.h"
 
 namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdostream : public std::ostream {
+class fdostream : public std::ostream, public fdstream {
 
 public:
 	fdostream();
-	fdostream( int fd, std::size_t buffer_size = 256 );
+	fdostream( int fd, std::size_t buffer_size = 256, bool auto_close = false );
 	virtual ~fdostream();
 
-	void interrupt();
-
 	fdostream &operator=( const fdostream & other );
+
+protected:
+	void close();
+
+	fdstreambuf &getBuf();
 
 private:
     // copy ctor and assignment not implemented;

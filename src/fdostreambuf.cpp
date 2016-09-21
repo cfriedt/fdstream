@@ -41,8 +41,7 @@ using namespace ::com::github::cfriedt;
 
 fdostreambuf::fdostreambuf( int fd, size_t buffer_size )
 :
-	fd( fd ),
-	buffer( ::max( buffer_size, (size_t) 1 ) )
+	fdstreambuf( fd, buffer_size )
 {
 
 	char_type *base;
@@ -58,7 +57,6 @@ fdostreambuf::fdostreambuf( int fd, size_t buffer_size )
 }
 
 fdostreambuf::~fdostreambuf() {
-	close_fds();
 }
 
 fdostreambuf::int_type fdostreambuf::overflow( int_type ch ) {
@@ -83,32 +81,6 @@ fdostreambuf::int_type fdostreambuf::overflow( int_type ch ) {
 
 out:
     return r;
-}
-
-void fdostreambuf::interrupt() {
-	int r;
-	const uint8_t x = '!';
-
-	r = ::write( sv[ fdostreambuf::INTERRUPTOR ], &x, sizeof( x ) );
-	if ( -1 == r ) {
-		throw std::system_error( errno, std::system_category() );
-	}
-}
-
-void fdostreambuf::close_fds() {
-	// TODO: add another public method to set whether the fd is automatically closed
-//	if ( -1 != fd ) {
-//		::close( fd );
-//		fd = -1;
-//	}
-	if ( -1 != sv[ 0 ] ) {
-		::close( sv[ 0 ] );
-		sv[ 0 ] = -1;
-	}
-	if ( -1 != sv[ 1 ] ) {
-		::close( sv[ 1 ] );
-		sv[ 1 ] = -1;
-	}
 }
 
 int fdostreambuf::sync() {
@@ -167,7 +139,6 @@ rethrow:
     return r;
 }
 
-
 fdostreambuf & fdostreambuf::operator=( const fdostreambuf & other ) {
 	if ( & other == this ) {
 		goto out;
@@ -179,4 +150,3 @@ fdostreambuf & fdostreambuf::operator=( const fdostreambuf & other ) {
 out:
 	return *this;
 }
-

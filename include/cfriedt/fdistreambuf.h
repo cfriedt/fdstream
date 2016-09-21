@@ -28,25 +28,24 @@
 #include <streambuf>
 #include <vector>
 
+#include "cfriedt/fdstreambuf.h"
+#include "cfriedt/autocloseable.h"
+
 namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdistreambuf : public std::streambuf {
+class fdistreambuf : public fdstreambuf {
 
 public:
 
 	fdistreambuf( int fd, std::size_t buffer_size = 256, std::size_t put_back = 8 );
 	virtual ~fdistreambuf();
 
-	void interrupt();
-
     fdistreambuf & operator=( const fdistreambuf & other );
 
 protected:
-	int fd;
 	const std::size_t put_back;
-	std::vector<char_type> buffer;
 
 	int_type underflow();
 
@@ -58,10 +57,6 @@ private:
     	INTERRUPTEE,
 		INTERRUPTOR,
     };
-
-    int sv[ 2 ];
-
-    void close_fds();
 };
 
 }

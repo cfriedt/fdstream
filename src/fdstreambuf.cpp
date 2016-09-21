@@ -36,8 +36,8 @@ using namespace ::com::github::cfriedt;
 
 fdstreambuf::fdstreambuf( int fd, std::size_t buffer_size, std::ios_base::openmode mode  )
 :
-	fd( fd ),
 	::com::github::cfriedt::filebuf( fd, mode ),
+	fd( fd ),
 	buffer( buffer_size )
 {
 	int r;

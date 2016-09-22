@@ -118,6 +118,7 @@ filebuf::filebuf(filebuf&& __rhs)
     __rhs.__ibs_ = 0;
     __rhs.__file_ = 0;
     __rhs.__file_fd_ = -1;
+    __rhs.__do_not_close_file_ = false;
     __rhs.__st_ = mbstate_t();
     __rhs.__st_last_ = mbstate_t();
     __rhs.__om_ = 0;
@@ -137,6 +138,7 @@ filebuf::filebuf()
       __ibs_(0),
       __file_(0),
 	  __file_fd_(-1),
+	  __do_not_close_file_(false),
       __cv_(nullptr),
       __st_(),
       __st_last_(),
@@ -163,6 +165,7 @@ filebuf::filebuf( int fd, std::ios_base::openmode __mode )
       __ibs_(0),
       __file_(0),
 	  __file_fd_(-1),
+	  __do_not_close_file_(false),
       __cv_(nullptr),
       __st_(),
       __st_last_(),
@@ -181,6 +184,7 @@ filebuf::filebuf( int fd, std::ios_base::openmode __mode )
 		__file_ = fdopen( fd, __strmod );
 		if ( 0 != __file_ ) {
 			__file_fd_ = fd;
+			__do_not_close_file_ = true;
             __om_ = __mode;
             if (__mode & std::ios_base::ate)
             {
@@ -189,6 +193,7 @@ filebuf::filebuf( int fd, std::ios_base::openmode __mode )
                     fclose(__file_);
                     __file_ = 0;
                     __file_fd_ = -1;
+                    __do_not_close_file_ = false;
                 }
             }
 
@@ -264,6 +269,7 @@ filebuf::swap(filebuf& __rhs)
     _VSTD::swap(__ibs_, __rhs.__ibs_);
     _VSTD::swap(__file_, __rhs.__file_);
     _VSTD::swap(__file_fd_, __rhs.__file_fd_);
+    _VSTD::swap(__do_not_close_file_, __rhs.__do_not_close_file_);
     _VSTD::swap(__cv_, __rhs.__cv_);
     _VSTD::swap(__st_, __rhs.__st_);
     _VSTD::swap(__st_last_, __rhs.__st_last_);
@@ -796,20 +802,23 @@ filebuf*
 filebuf::close()
 {
     filebuf* __rt = 0;
-    if (__file_)
+    if (__file_ )
     {
         __rt = this;
-        std::unique_ptr<FILE, int(*)(FILE*)> __h(__file_, fclose);
-        if (sync())
-            __rt = 0;
-        if (fclose(__h.release()) == 0)
+        if ( ! __do_not_close_file_ )
         {
-            __file_ = 0;
-            __file_fd_ = -1;
-        }
-        else
-        {
-            __rt = 0;
+			std::unique_ptr<FILE, int(*)(FILE*)> __h(__file_, fclose);
+			if (sync())
+				__rt = 0;
+			if (fclose(__h.release()) == 0)
+			{
+				__file_ = 0;
+				__file_fd_ = -1;
+			}
+			else
+			{
+				__rt = 0;
+			}
         }
     }
     return __rt;

@@ -58,8 +58,7 @@ StdInTest::~StdInTest() {
 }
 
 void StdInTest::SetUp() {
-	// XXX: use dup(2) so that we don't inadvertantly close the last reference to stdout
-	is = fdistream( ::dup( STDIN_FILENO ) );
+	is = fdistream( STDIN_FILENO );
 }
 
 void StdInTest::TearDown() {

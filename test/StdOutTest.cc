@@ -54,8 +54,7 @@ StdOutTest::~StdOutTest() {
 }
 
 void StdOutTest::SetUp() {
-	// XXX: use dup(2) so that we don't inadvertantly close the last reference to stdout
-	os = fdostream( ::dup( STDOUT_FILENO ) );
+	os = fdostream( STDOUT_FILENO );
 }
 
 void StdOutTest::TearDown() {

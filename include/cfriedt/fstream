@@ -102,6 +102,7 @@ protected:
     size_t __ibs_;
     FILE* __file_;
     int   __file_fd_;
+    bool __do_not_close_file_;
     const std::codecvt<char_type, char, mbstate_t>* __cv_;
     mbstate_t __st_;
     mbstate_t __st_last_;

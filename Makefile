@@ -80,6 +80,7 @@ else
 #assume gcc
 CFLAGS += -ferror-max=1
 endif
+CFLAGS += -Wno-deprecated-declarations
 CFLAGS += -Wall
 CFLAGS += -O0 -g
 CFLAGS += -I$(TOPDIR)/$(INCDIR)

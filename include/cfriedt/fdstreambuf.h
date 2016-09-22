@@ -25,7 +25,6 @@
 #ifndef com_github_cfriedt_fdstreambuf_h_
 #define com_github_cfriedt_fdstreambuf_h_
 
-#include <fstream>
 #include <vector>
 
 #include "cfriedt/fstream"
@@ -37,11 +36,13 @@ namespace cfriedt {
 class fdstreambuf : public ::com::github::cfriedt::filebuf {
 
 public:
-	fdstreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out );
+	fdstreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out, std::size_t buffer_size = 256 );
 	virtual ~fdstreambuf() = 0;
 
 	void interrupt();
-	int getFd();
+	int get_fd();
+
+	void swap( fdstreambuf & __rhs );
 
 protected:
 
@@ -50,8 +51,11 @@ protected:
 		INTERRUPTOR,
 	};
 
-    int sv[ 2 ];
+    int sv[ 2 ] = { -1, -1, };
+    std::vector<char_type> buffer;
 
+    void setup_interrupt_fds();
+    void close_interrupt_fds();
 };
 
 }

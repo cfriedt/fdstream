@@ -37,7 +37,7 @@ namespace cfriedt {
 class fdistream : public std::istream, public fdstream {
 
 public:
-	fdistream( int fd = -1, std::ios_base::openmode mode = std::ios_base::in, bool auto_close = false );
+	fdistream( int fd = -1, std::ios_base::openmode mode = std::ios_base::in, bool auto_close = false, std::size_t buffer_size = 256, std::size_t put_back_size = 8 );
 	virtual ~fdistream();
 
 	fdistream & operator=( fdistream && __rhs );

@@ -49,5 +49,5 @@ void fdstream::interrupt() {
 }
 
 void fdstream::close() {
-	::close( getBuf().getFd() );
+	::close( getBuf().get_fd() );
 }

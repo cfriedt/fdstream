@@ -43,6 +43,10 @@ fdostreambuf::fdostreambuf( int fd, std::ios_base::openmode mode )
 :
 	fdstreambuf( fd, mode )
 {
+	char_type *base;
+
+	base = & buffer.front();
+	setp( base, base + buffer.size() - 1  );
 }
 
 fdostreambuf::~fdostreambuf() {
@@ -91,7 +95,9 @@ int fdostreambuf::sync() {
     	r = EXIT_SUCCESS;
     }
 
-    fd = getFd();
+    fd = get_fd();
+
+    setup_interrupt_fds();
 
     FD_ZERO( & rfds );
     FD_SET( sv[ fdostreambuf::INTERRUPTEE ], & rfds );

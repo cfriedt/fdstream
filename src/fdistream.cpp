@@ -29,12 +29,12 @@ using std::size_t;
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdistream::fdistream( int fd, std::ios_base::openmode mode, bool auto_close )
+fdistream::fdistream( int fd, std::ios_base::openmode mode, bool auto_close, size_t buffer_size, size_t put_back_size )
 :
 	std::ios( 0 ),
 	std::istream( & buf ),
 	fdstream( auto_close ),
-	buf( fd, mode )
+	buf( fd, mode, buffer_size, put_back_size )
 {
 }
 

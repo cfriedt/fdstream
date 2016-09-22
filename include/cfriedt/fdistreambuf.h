@@ -25,7 +25,6 @@
 #ifndef com_github_cfriedt_fdistreambuf_h_
 #define com_github_cfriedt_fdistreambuf_h_
 
-#include <streambuf>
 #include <vector>
 
 #include "cfriedt/fdstreambuf.h"
@@ -39,11 +38,16 @@ class fdistreambuf : public fdstreambuf {
 
 public:
 
-	fdistreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in );
+	fdistreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in, std::size_t buffer_size = 256, std::size_t put_back_size = 8 );
 	virtual ~fdistreambuf();
 
 protected:
+
+	const std::size_t put_back;
+
 	int_type underflow();
+
+
 };
 
 }

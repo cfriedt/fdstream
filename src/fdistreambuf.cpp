@@ -38,21 +38,26 @@ using namespace ::com::github::cfriedt;
 
 // derived from http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
 
-fdistreambuf::fdistreambuf( int fd, std::ios_base::openmode mode )
+fdistreambuf::fdistreambuf( int fd, std::ios_base::openmode mode, size_t buffer_size, size_t put_back_size )
 :
-	fdstreambuf( fd, mode )
+	fdstreambuf( fd, mode, buffer_size ),
+	put_back( ::max( put_back_size, (size_t)1 ) )
 {
+	char_type *end;
+
+	end = & buffer.front() + buffer.size();
+	setg( end, end, end );
 }
 
 fdistreambuf::~fdistreambuf() {
 }
 
 std::streambuf::int_type fdistreambuf::underflow() {
-	return traits_type::eof();
-/*
 	int r;
 	int nfds;
 	fd_set rfds;
+
+	int fd;
 
 	if ( gptr() < egptr() ) { // buffer not exhausted
 		return traits_type::to_int_type( *gptr() );
@@ -66,6 +71,10 @@ std::streambuf::int_type fdistreambuf::underflow() {
 		::memmove( base, egptr() - put_back, put_back );
 		start += put_back;
 	}
+
+	fd = get_fd();
+
+	setup_interrupt_fds();
 
 	FD_ZERO( & rfds );
 	FD_SET( fd, & rfds );
@@ -107,5 +116,4 @@ rethrow:
 	setg( base, start, start + r );
 
 	return traits_type::to_int_type( *gptr() );
-	*/
 }

@@ -25,6 +25,8 @@
 #ifndef com_github_cfriedt_autocloseable_h_
 #define com_github_cfriedt_autocloseable_h_
 
+#include <algorithm>
+
 namespace com {
 namespace github {
 namespace cfriedt {
@@ -41,6 +43,10 @@ public:
 		if ( auto_close_ ) {
 			close();
 		}
+	}
+
+	void swap( autocloseable & __rhs ) {
+		std::swap( auto_close_, __rhs.auto_close_ );
 	}
 
 	bool autoclose() {

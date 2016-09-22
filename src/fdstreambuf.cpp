@@ -35,24 +35,20 @@ using ::com::github::cfriedt::filebuf;
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdstreambuf::fdstreambuf( int fd, std::ios_base::openmode mode  )
+fdstreambuf::fdstreambuf( int fd, std::ios_base::openmode mode, size_t buffer_size  )
 :
-	filebuf( fd, mode )
+	filebuf( fd, mode ),
+	buffer( std::max( buffer_size, (size_t) 1 ) )
 {
-	int r;
-	r = ::socketpair( AF_UNIX, SOCK_STREAM, 0, sv );
-	if ( -1 == r ) {
-		throw std::system_error( errno, std::system_category() );
-	}
 }
 
 fdstreambuf::~fdstreambuf() {
-	for( int i = 0; i < 2; i++ ) {
-		if ( -1 != sv[ i ] ) {
-			::close( sv[ i ] );
-			sv[ i ] = -1;
-		}
-	}
+	close_interrupt_fds();
+}
+
+void fdstreambuf::swap( fdstreambuf & __rhs ) {
+    filebuf::swap( __rhs );
+    buffer.swap( __rhs.buffer );
 }
 
 void fdstreambuf::interrupt() {
@@ -65,7 +61,35 @@ void fdstreambuf::interrupt() {
 	}
 }
 
-int fdstreambuf::getFd() {
+int fdstreambuf::get_fd() {
 	return __file_fd_;
 }
 
+void fdstreambuf::setup_interrupt_fds() {
+	int r;
+	int nclosed;
+
+	// just to ensure that the sv[0:1] are either both open or both closed
+	for( r = 0, nclosed = 0; r < 2; r++ ) {
+		if ( -1 == sv[ r ] ) {
+			close_interrupt_fds();
+			break;
+		}
+	}
+
+	if ( -1 == sv[ fdstreambuf::INTERRUPTEE ] ) {
+		r = ::socketpair( AF_UNIX, SOCK_STREAM, 0, sv );
+		if ( -1 == r ) {
+			throw std::system_error( errno, std::system_category() );
+		}
+	}
+}
+
+void fdstreambuf::close_interrupt_fds() {
+	for( int i = 0; i < 2; i++ ) {
+		if ( -1 != sv[ i ] ) {
+			::close( sv[ i ] );
+			sv[ i ] = -1;
+		}
+	}
+}

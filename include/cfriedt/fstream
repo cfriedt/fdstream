@@ -32,6 +32,8 @@
 //#include <__locale>
 #include <cstdio>
 
+#include <map>
+
 //#include <__undef_min_max>
 
 //_LIBCPP_BEGIN_NAMESPACE_STD
@@ -99,6 +101,7 @@ private:
     char_type* __intbuf_;
     size_t __ibs_;
     FILE* __file_;
+    int   __file_fd_;
     const std::codecvt<char_type, char, mbstate_t>* __cv_;
     mbstate_t __st_;
     mbstate_t __st_last_;
@@ -110,6 +113,9 @@ private:
 
     bool __read_mode();
     void __write_mode();
+
+    static const std::map<std::ios_base::openmode,std::string> mode_to_str;
+    static const std::map<std::string,std::ios_base::openmode> str_to_mode;
 };
 
 

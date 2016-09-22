@@ -27,6 +27,42 @@
 
 using namespace ::com::github::cfriedt;
 
+const std::map<std::ios_base::openmode,std::string> filebuf::mode_to_str {
+	{ std::ios_base::out, "w" },
+	{ std::ios_base::out | std::ios_base::trunc, "w" },
+	{ std::ios_base::out | std::ios_base::app, "a" },
+	{ std::ios_base::app, "a" },
+	{ std::ios_base::in, "r" },
+	{ std::ios_base::in | std::ios_base::out, "r+" },
+	{ std::ios_base::in | std::ios_base::out | std::ios_base::trunc, "w+" },
+	{ std::ios_base::in | std::ios_base::out | std::ios_base::app, "a+" },
+	{ std::ios_base::in | std::ios_base::app, "a+" },
+	{ std::ios_base::out | std::ios_base::binary, "wb" },
+	{ std::ios_base::out | std::ios_base::trunc | std::ios_base::binary, "wb" },
+	{ std::ios_base::out | std::ios_base::app | std::ios_base::binary, "ab" },
+	{ std::ios_base::app | std::ios_base::binary, "ab" },
+	{ std::ios_base::in | std::ios_base::binary, "rb" },
+	{ std::ios_base::in | std::ios_base::out | std::ios_base::binary, "r+b" },
+	{ std::ios_base::in | std::ios_base::out | std::ios_base::trunc | std::ios_base::binary, "w+b" },
+	{ std::ios_base::in | std::ios_base::out | std::ios_base::app | std::ios_base::binary, "a+b" },
+	{ std::ios_base::in | std::ios_base::app | std::ios_base::binary, "a+b" },
+};
+
+const std::map<std::string,std::ios_base::openmode> filebuf::str_to_mode {
+	{ "w", std::ios_base::out | std::ios_base::trunc },
+	{ "a", std::ios_base::out | std::ios_base::app },
+	{ "r", std::ios_base::in },
+	{ "r+", std::ios_base::in | std::ios_base::out },
+	{ "w+", std::ios_base::in | std::ios_base::out | std::ios_base::trunc },
+	{ "a+", std::ios_base::in | std::ios_base::out | std::ios_base::app },
+	{ "wb", std::ios_base::out | std::ios_base::trunc | std::ios_base::binary },
+	{ "ab", std::ios_base::out | std::ios_base::app | std::ios_base::binary },
+	{ "rb", std::ios_base::in | std::ios_base::binary },
+	{ "r+b", std::ios_base::in | std::ios_base::out | std::ios_base::binary },
+	{ "w+b", std::ios_base::in | std::ios_base::out | std::ios_base::trunc | std::ios_base::binary },
+	{ "a+b", std::ios_base::in | std::ios_base::out | std::ios_base::app | std::ios_base::binary },
+};
+
 filebuf::filebuf(filebuf&& __rhs)
     : std::streambuf(__rhs)
 {
@@ -46,6 +82,7 @@ filebuf::filebuf(filebuf&& __rhs)
     __intbuf_ = __rhs.__intbuf_;
     __ibs_ = __rhs.__ibs_;
     __file_ = __rhs.__file_;
+    __file_fd_ = __rhs.__file_fd_;
     __cv_ = __rhs.__cv_;
     __st_ = __rhs.__st_;
     __st_last_ = __rhs.__st_last_;
@@ -80,6 +117,7 @@ filebuf::filebuf(filebuf&& __rhs)
     __rhs.__intbuf_ = 0;
     __rhs.__ibs_ = 0;
     __rhs.__file_ = 0;
+    __rhs.__file_fd_ = -1;
     __rhs.__st_ = mbstate_t();
     __rhs.__st_last_ = mbstate_t();
     __rhs.__om_ = 0;
@@ -98,6 +136,7 @@ filebuf::filebuf()
       __intbuf_(0),
       __ibs_(0),
       __file_(0),
+	  __file_fd_(-1),
       __cv_(nullptr),
       __st_(),
       __st_last_(),
@@ -115,7 +154,7 @@ filebuf::filebuf()
     setbuf(0, 4096);
 }
 
-filebuf::filebuf( int fd, std::ios_base::openmode mode )
+filebuf::filebuf( int fd, std::ios_base::openmode __mode )
     : __extbuf_(0),
       __extbufnext_(0),
       __extbufend_(0),
@@ -123,6 +162,7 @@ filebuf::filebuf( int fd, std::ios_base::openmode mode )
       __intbuf_(0),
       __ibs_(0),
       __file_(0),
+	  __file_fd_(-1),
       __cv_(nullptr),
       __st_(),
       __st_last_(),
@@ -132,6 +172,28 @@ filebuf::filebuf( int fd, std::ios_base::openmode mode )
       __owns_ib_(false),
       __always_noconv_(false)
 {
+	std::map<std::ios_base::openmode,std::string>::const_iterator it;
+
+	it = mode_to_str.find( __mode & ~std::ios_base::ate );
+
+	const char *__strmod = mode_to_str.end() == it ? 0 : it->second.c_str();
+	if ( 0 != __strmod ) {
+		__file_ = fdopen( fd, __strmod );
+		if ( 0 != __file_ ) {
+			__file_fd_ = fd;
+            __om_ = __mode;
+            if (__mode & std::ios_base::ate)
+            {
+                if (fseek(__file_, 0, SEEK_END))
+                {
+                    fclose(__file_);
+                    __file_ = 0;
+                    __file_fd_ = -1;
+                }
+            }
+
+		}
+	}
 }
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
@@ -201,6 +263,7 @@ filebuf::swap(filebuf& __rhs)
     _VSTD::swap(__intbuf_, __rhs.__intbuf_);
     _VSTD::swap(__ibs_, __rhs.__ibs_);
     _VSTD::swap(__file_, __rhs.__file_);
+    _VSTD::swap(__file_fd_, __rhs.__file_fd_);
     _VSTD::swap(__cv_, __rhs.__cv_);
     _VSTD::swap(__st_, __rhs.__st_);
     _VSTD::swap(__st_last_, __rhs.__st_last_);
@@ -267,60 +330,16 @@ filebuf::open(const char* __s, std::ios_base::openmode __mode)
     if (__file_ == 0)
     {
         __rt = this;
-        const char* __mdstr;
-        switch (__mode & ~std::ios_base::ate)
-        {
-        case std::ios_base::out:
-        case std::ios_base::out | std::ios_base::trunc:
-            __mdstr = "w";
-            break;
-        case std::ios_base::out | std::ios_base::app:
-        case std::ios_base::app:
-            __mdstr = "a";
-            break;
-        case std::ios_base::in:
-            __mdstr = "r";
-            break;
-        case std::ios_base::in | std::ios_base::out:
-            __mdstr = "r+";
-            break;
-        case std::ios_base::in | std::ios_base::out | std::ios_base::trunc:
-            __mdstr = "w+";
-            break;
-        case std::ios_base::in | std::ios_base::out | std::ios_base::app:
-        case std::ios_base::in | std::ios_base::app:
-            __mdstr = "a+";
-            break;
-        case std::ios_base::out | std::ios_base::binary:
-        case std::ios_base::out | std::ios_base::trunc | std::ios_base::binary:
-            __mdstr = "wb";
-            break;
-        case std::ios_base::out | std::ios_base::app | std::ios_base::binary:
-        case std::ios_base::app | std::ios_base::binary:
-            __mdstr = "ab";
-            break;
-        case std::ios_base::in | std::ios_base::binary:
-            __mdstr = "rb";
-            break;
-        case std::ios_base::in | std::ios_base::out | std::ios_base::binary:
-            __mdstr = "r+b";
-            break;
-        case std::ios_base::in | std::ios_base::out | std::ios_base::trunc | std::ios_base::binary:
-            __mdstr = "w+b";
-            break;
-        case std::ios_base::in | std::ios_base::out | std::ios_base::app | std::ios_base::binary:
-        case std::ios_base::in | std::ios_base::app | std::ios_base::binary:
-            __mdstr = "a+b";
-            break;
-        default:
-            __rt = 0;
-            break;
-        }
+        std::map<std::ios_base::openmode,std::string>::const_iterator __it;
+        __it = mode_to_str.find( __mode & ~std::ios_base::ate );
+        const char* __mdstr = mode_to_str.end() == __it ? 0 : __it->second.c_str();
+        __rt = 0 == __mdstr ? 0 : this;
         if (__rt)
         {
             __file_ = fopen(__s, __mdstr);
             if (__file_)
             {
+                __file_fd_ = fileno( __file_ );
                 __om_ = __mode;
                 if (__mode & std::ios_base::ate)
                 {
@@ -328,12 +347,15 @@ filebuf::open(const char* __s, std::ios_base::openmode __mode)
                     {
                         fclose(__file_);
                         __file_ = 0;
+                        __file_fd_ = -1;
                         __rt = 0;
                     }
                 }
             }
             else
+            {
                 __rt = 0;
+            }
         }
     }
     return __rt;
@@ -781,9 +803,14 @@ filebuf::close()
         if (sync())
             __rt = 0;
         if (fclose(__h.release()) == 0)
+        {
             __file_ = 0;
+            __file_fd_ = -1;
+        }
         else
+        {
             __rt = 0;
+        }
     }
     return __rt;
 }

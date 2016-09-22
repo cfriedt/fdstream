@@ -27,7 +27,7 @@
 
 using namespace ::com::github::cfriedt;
 
-const std::map<std::ios_base::openmode,std::string> filebuf::mode_to_str {
+const std::map<std::ios_base::openmode,const char *> filebuf::mode_to_str {
 	{ std::ios_base::out, "w" },
 	{ std::ios_base::out | std::ios_base::trunc, "w" },
 	{ std::ios_base::out | std::ios_base::app, "a" },
@@ -48,7 +48,7 @@ const std::map<std::ios_base::openmode,std::string> filebuf::mode_to_str {
 	{ std::ios_base::in | std::ios_base::app | std::ios_base::binary, "a+b" },
 };
 
-const std::map<std::string,std::ios_base::openmode> filebuf::str_to_mode {
+const std::map<const char *,std::ios_base::openmode> filebuf::str_to_mode {
 	{ "w", std::ios_base::out | std::ios_base::trunc },
 	{ "a", std::ios_base::out | std::ios_base::app },
 	{ "r", std::ios_base::in },
@@ -172,11 +172,11 @@ filebuf::filebuf( int fd, std::ios_base::openmode __mode )
       __owns_ib_(false),
       __always_noconv_(false)
 {
-	std::map<std::ios_base::openmode,std::string>::const_iterator it;
+	std::map<std::ios_base::openmode,const char *>::const_iterator it;
 
 	it = mode_to_str.find( __mode & ~std::ios_base::ate );
 
-	const char *__strmod = mode_to_str.end() == it ? 0 : it->second.c_str();
+	const char *__strmod = mode_to_str.end() == it ? 0 : it->second;
 	if ( 0 != __strmod ) {
 		__file_ = fdopen( fd, __strmod );
 		if ( 0 != __file_ ) {
@@ -330,9 +330,9 @@ filebuf::open(const char* __s, std::ios_base::openmode __mode)
     if (__file_ == 0)
     {
         __rt = this;
-        std::map<std::ios_base::openmode,std::string>::const_iterator __it;
+        std::map<std::ios_base::openmode,const char *>::const_iterator __it;
         __it = mode_to_str.find( __mode & ~std::ios_base::ate );
-        const char* __mdstr = mode_to_str.end() == __it ? 0 : __it->second.c_str();
+        const char* __mdstr = mode_to_str.end() == __it ? 0 : __it->second;
         __rt = 0 == __mdstr ? 0 : this;
         if (__rt)
         {

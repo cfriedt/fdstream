@@ -114,8 +114,8 @@ private:
     bool __read_mode();
     void __write_mode();
 
-    static const std::map<std::ios_base::openmode,std::string> mode_to_str;
-    static const std::map<std::string,std::ios_base::openmode> str_to_mode;
+    static const std::map<std::ios_base::openmode,const char *> mode_to_str;
+    static const std::map<const char *,std::ios_base::openmode> str_to_mode;
 };
 
 

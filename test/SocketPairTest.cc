@@ -93,9 +93,8 @@ TEST_F( SocketPairTest, PassMessage ) {
 
 	std::thread th( interrupt_test, this );
 
-	os << tx_msg;
-	os.flush();
-	// Note, std::string overloads the >> operator, and tokenizes string
+	os << tx_msg << std::flush;
+	// Note, std::string overloads the >> operator and tokenizes string
 	// input by default, which is why is.read() must be used instead
 	is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
 	rx_msg = std::string( rx_msg_buf );
@@ -112,8 +111,7 @@ TEST_F( SocketPairTest, PassBinary ) {
 
 	std::thread th( interrupt_test, this );
 
-	os << tx_msg;
-	os.flush();
+	os << tx_msg << std::flush;
 	is >> rx_msg;
 
 	EXPECT_EQ( tx_msg, rx_msg );

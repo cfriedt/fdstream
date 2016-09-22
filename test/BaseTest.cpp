@@ -22,52 +22,29 @@
  * SOFTWARE.
  */
 
-#include <cstdio>
-#include <chrono>
-#include <thread>
-
-#include <gtest/gtest.h>
-
-#include <signal.h>
-#include <sys/time.h>
-
-
-#include "cfriedt/fdistream.h"
-
 #include "BaseTest.h"
 
-using namespace ::std;
-using namespace ::com::github::cfriedt;
+#include <unistd.h>
 
-class StdInTest : public BaseTest {
-
-public:
-
-	fdistream is;
-
-	StdInTest() {}
-	~StdInTest() {}
-
-	void SetUpVirt();
-
-	void interrupt_cb();
-};
-
-void StdInTest::SetUpVirt() {
-	is = fdistream( STDIN_FILENO );
+BaseTest::BaseTest()
+{
 }
 
-void StdInTest::interrupt_cb() {
-	is.interrupt();
+BaseTest::~BaseTest()
+{
 }
 
-TEST_F( StdInTest, CatchInterrupt ) {
+void BaseTest::SetUp() {
+	SetUpVirt();
+	interrupt_th = thread( interrupt, this );
+}
 
-	try {
+void BaseTest::TearDown() {
+	TearDownVirt();
+	interrupt_th.join();
+}
 
-		std::string something;
-		is >> something;
-
-	} catch( ... ) {
-	}
+void BaseTest::interrupt( BaseTest *siht ) {
+	usleep( siht->interrupt_delay_ms() * 1000 );
+	siht->interrupt_cb();
 }

@@ -30,34 +30,31 @@
 
 #include "cfriedt/fdostream.h"
 
+#include "BaseTest.h"
+
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-class StdOutTest : public testing::Test {
+class StdOutTest : public BaseTest {
 
 public:
 
 	fdostream os;
 
-	StdOutTest();
-	~StdOutTest();
+	StdOutTest() {}
+	~StdOutTest() {}
 
-	void SetUp();
-	void TearDown();
+	void SetUpVirt();
+
+	void interrupt_cb();
 };
 
-StdOutTest::StdOutTest()
-{
-}
-
-StdOutTest::~StdOutTest() {
-}
-
-void StdOutTest::SetUp() {
+void StdOutTest::SetUpVirt() {
 	os = fdostream( STDOUT_FILENO );
 }
 
-void StdOutTest::TearDown() {
+void StdOutTest::interrupt_cb() {
+	os.interrupt();
 }
 
 TEST_F( StdOutTest, WriteHelloWorld ) {

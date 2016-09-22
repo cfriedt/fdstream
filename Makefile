@@ -39,6 +39,8 @@ INCDIR := include
 SRCDIR := src
 TESTDIR := test
 
+HDR := $(shell find * -name '*.h')
+
 C_SRC := $(shell find $(SRCDIR) -name '*.c')
 C_OBJ := $(C_SRC:.c=.o)
 #$(info C_SRC := '$(C_SRC)' C_OBJ := '$(C_OBJ)')

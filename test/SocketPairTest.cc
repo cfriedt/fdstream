@@ -32,10 +32,12 @@
 
 #include "cfriedt/fdstream.h"
 
+#include "BaseTest.h"
+
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-class SocketPairTest : public testing::Test {
+class SocketPairTest : public BaseTest {
 
 public:
 
@@ -48,21 +50,15 @@ public:
 	fdostream os;
 	int sv[ 2 ];
 
-	SocketPairTest();
-	~SocketPairTest();
+	SocketPairTest() {}
+	~SocketPairTest() {}
 
-	void SetUp();
-	void TearDown();
+	void SetUpVirt();
+
+	void interrupt_cb();
 };
 
-SocketPairTest::SocketPairTest()
-{
-}
-
-SocketPairTest::~SocketPairTest() {
-}
-
-void SocketPairTest::SetUp() {
+void SocketPairTest::SetUpVirt() {
 
 	int r;
 	r = socketpair( AF_UNIX, SOCK_STREAM, 0, sv );
@@ -74,13 +70,9 @@ void SocketPairTest::SetUp() {
 	is = fdistream( sv[ SERVER ] );
 }
 
-void SocketPairTest::TearDown() {
-}
-
-static void interrupt_test( SocketPairTest *spt ) {
-	::sleep( 1 );
-	spt->is.interrupt();
-	spt->os.interrupt();
+void SocketPairTest::interrupt_cb() {
+	is.interrupt();
+	os.interrupt();
 }
 
 TEST_F( SocketPairTest, PassMessage ) {
@@ -91,8 +83,6 @@ TEST_F( SocketPairTest, PassMessage ) {
 
 	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
 
-	std::thread th( interrupt_test, this );
-
 	os << tx_msg << std::flush;
 	// Note, std::string overloads the >> operator and tokenizes string
 	// input by default, which is why is.read() must be used instead
@@ -100,8 +90,6 @@ TEST_F( SocketPairTest, PassMessage ) {
 	rx_msg = std::string( rx_msg_buf );
 
 	EXPECT_EQ( tx_msg, rx_msg );
-
-	th.join();
 }
 
 TEST_F( SocketPairTest, PassBinary ) {
@@ -109,12 +97,8 @@ TEST_F( SocketPairTest, PassBinary ) {
 	uint16_t tx_msg = 0x7e57;
 	uint16_t rx_msg;
 
-	std::thread th( interrupt_test, this );
-
 	os << tx_msg << std::flush;
 	is >> rx_msg;
 
 	EXPECT_EQ( tx_msg, rx_msg );
-
-	th.join();
 }

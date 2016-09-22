@@ -31,16 +31,21 @@ using std::size_t;
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdostream::fdostream( int fd, size_t buffer_size, bool auto_close )
+fdostream::fdostream( int fd, std::ios_base::openmode mode, bool auto_close )
 :
 	ios( 0 ),
 	ostream( & buf ),
 	fdstream( auto_close ),
-	buf( fd, buffer_size )
+	buf( fd, mode )
 {
 }
 
 fdostream::~fdostream() {
+}
+
+fdostream & fdostream::operator=( fdostream && __rhs ) {
+	buf.swap( __rhs.buf );
+	return *this;
 }
 
 fdstreambuf & fdostream::getBuf() {

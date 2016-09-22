@@ -37,22 +37,15 @@ namespace cfriedt {
 class fdostream : public std::ostream, public fdstream {
 
 public:
-	fdostream();
-	fdostream( int fd, std::size_t buffer_size = 256, bool auto_close = false );
+	fdostream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out, bool auto_close = false );
 	virtual ~fdostream();
 
-	fdostream &operator=( const fdostream & other );
+	fdostream & operator=( fdostream && __rhs );
 
 protected:
-	void close();
-
 	fdstreambuf &getBuf();
 
 private:
-    // copy ctor and assignment not implemented;
-    // copying not allowed
-	fdostream( const fdostream & );
-
 	fdostreambuf buf;
 
 };

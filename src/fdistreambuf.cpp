@@ -48,7 +48,7 @@ fdistreambuf::~fdistreambuf() {
 }
 
 std::streambuf::int_type fdistreambuf::underflow() {
-
+	return traits_type::eof();
 /*
 	int r;
 	int nfds;

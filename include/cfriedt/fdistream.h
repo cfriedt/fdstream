@@ -40,7 +40,10 @@ public:
 	fdistream( int fd = -1, std::ios_base::openmode mode = std::ios_base::in, bool auto_close = false );
 	virtual ~fdistream();
 
+	fdistream & operator=( fdistream && __rhs );
+
 protected:
+	fdstreambuf & getBuf();
 
 private:
 	fdistreambuf buf;

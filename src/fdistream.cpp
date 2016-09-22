@@ -41,6 +41,11 @@ fdistream::fdistream( int fd, std::ios_base::openmode mode, bool auto_close )
 fdistream::~fdistream() {
 }
 
+fdistream & fdistream::operator=( fdistream && __rhs ) {
+	buf.swap( __rhs.buf );
+	return *this;
+}
+
 fdstreambuf & fdistream::getBuf() {
 	return buf;
 }

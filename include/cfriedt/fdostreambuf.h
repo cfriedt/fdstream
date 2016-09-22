@@ -37,19 +37,12 @@ class fdostreambuf : public fdstreambuf {
 
 public:
 
-	fdostreambuf( int fd, std::size_t buffer_size = 256 );
+	fdostreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::out );
 	virtual ~fdostreambuf();
-
-    fdostreambuf &operator=( const fdostreambuf & other );
 
 protected:
 	int_type overflow( int_type ch );
 	int sync();
-
-private:
-    // copy ctor and assignment not implemented;
-    // copying not allowed
-	fdostreambuf( const fdostreambuf & );
 };
 
 }

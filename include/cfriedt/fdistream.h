@@ -37,19 +37,12 @@ namespace cfriedt {
 class fdistream : public std::istream, public fdstream {
 
 public:
-	fdistream();
-	fdistream( int fd, std::size_t buffer_size = 256, bool auto_close = false );
+	fdistream( int fd = -1, std::ios_base::openmode mode = std::ios_base::in, bool auto_close = false );
 	virtual ~fdistream();
 
-	fdistream &operator=( const fdistream & other );
-
 protected:
-	fdstreambuf &getBuf();
 
 private:
-    // copy ctor and assignment not implemented;
-	fdistream( const fdistream & );
-
 	fdistreambuf buf;
 
 };

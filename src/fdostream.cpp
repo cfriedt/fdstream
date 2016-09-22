@@ -40,33 +40,9 @@ fdostream::fdostream( int fd, size_t buffer_size, bool auto_close )
 {
 }
 
-fdostream::fdostream()
-:
-	fdostream( -1 )
-{
-}
-
 fdostream::~fdostream() {
 }
 
 fdstreambuf & fdostream::getBuf() {
 	return buf;
-}
-
-void fdostream::close() {
-	int fd;
-	fd = buf.getFd();
-	if ( -1 != fd ) {
-		::close( fd );
-	}
-}
-
-fdostream & fdostream::operator=( const fdostream & other ) {
-	if ( & other == this ) {
-		goto out;
-	}
-	buf = other.buf;
-	rdbuf( (streambuf *) & buf );
-out:
-	return *this;
 }

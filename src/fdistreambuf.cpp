@@ -38,16 +38,10 @@ using namespace ::com::github::cfriedt;
 
 // derived from http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
 
-fdistreambuf::fdistreambuf( int fd, size_t buffer_size, size_t put_back )
+fdistreambuf::fdistreambuf( int fd, std::ios_base::openmode mode )
 :
-	fdstreambuf( fd, buffer_size ),
-	put_back( std::max( put_back, size_t( 1 ) ) )
+	fdstreambuf( fd, mode )
 {
-
-	char_type *end;
-
-	end = &buffer.front() + buffer.size();
-	setg( end, end, end );
 }
 
 fdistreambuf::~fdistreambuf() {
@@ -55,6 +49,7 @@ fdistreambuf::~fdistreambuf() {
 
 std::streambuf::int_type fdistreambuf::underflow() {
 
+/*
 	int r;
 	int nfds;
 	fd_set rfds;
@@ -112,38 +107,5 @@ rethrow:
 	setg( base, start, start + r );
 
 	return traits_type::to_int_type( *gptr() );
-}
-
-fdistreambuf & fdistreambuf::operator=( const fdistreambuf & other ) {
-	char_type *front;
-	char_type *ofront;
-
-	char_type *oeback;
-	char_type *ogptr;
-	char_type *oegptr;
-
-	if ( & other == this ) {
-		goto out;
-	}
-
-	fd = other.fd;
-	*( (size_t *) & put_back ) = other.put_back;
-
-	buffer.clear();
-	buffer.insert( std::end( buffer ), std::begin( other.buffer ), std::end( other.buffer ) );
-
-	// XXX: FIXME: copy the contents of the other buffer, and determine proper offsets with
-	// setg(). Use this and other's eback(), gptr() and egptr()
-
-	front = &buffer.front();
-	ofront = (char_type *) &other.buffer.front();
-
-	oeback = other.eback();
-	ogptr = other.gptr();
-	oegptr = other.egptr();
-
-	setg( front + ( oeback - ofront ), front + ( ogptr - ofront ), front + ( oegptr - ofront ) );
-
-out:
-	return *this;
+	*/
 }

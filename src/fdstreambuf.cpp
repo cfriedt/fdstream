@@ -30,15 +30,14 @@
 #include <sys/socket.h>
 
 using ::std::size_t;
+using ::com::github::cfriedt::filebuf;
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdstreambuf::fdstreambuf( int fd, std::size_t buffer_size, std::ios_base::openmode mode  )
+fdstreambuf::fdstreambuf( int fd, std::ios_base::openmode mode  )
 :
-	::com::github::cfriedt::filebuf( fd, mode ),
-	fd( fd ),
-	buffer( buffer_size )
+	filebuf( fd, mode )
 {
 	int r;
 	r = ::socketpair( AF_UNIX, SOCK_STREAM, 0, sv );
@@ -67,6 +66,6 @@ void fdstreambuf::interrupt() {
 }
 
 int fdstreambuf::getFd() {
-	return fd;
+	return __file_fd_;
 }
 

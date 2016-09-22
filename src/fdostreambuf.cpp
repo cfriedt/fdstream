@@ -39,28 +39,16 @@ using namespace ::com::github::cfriedt;
 
 // adapted from http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
 
-fdostreambuf::fdostreambuf( int fd, size_t buffer_size )
+fdostreambuf::fdostreambuf( int fd, std::ios_base::openmode mode )
 :
-	fdstreambuf( fd, buffer_size, std::ios_base::binary )
+	fdstreambuf( fd, mode )
 {
-
-	char_type *base;
-	int r;
-
-	base = &buffer.front();
-	setp( base, base + buffer.size() - 1 );
-
-	r = ::socketpair( AF_UNIX, SOCK_STREAM, 0, sv );
-	if ( -1 == r ) {
-		throw std::system_error( errno, std::system_category() );
-	}
 }
 
 fdostreambuf::~fdostreambuf() {
 }
 
 fdostreambuf::int_type fdostreambuf::overflow( int_type ch ) {
-
 	int_type r;
 
 	r = traits_type::eof();
@@ -95,12 +83,15 @@ int fdostreambuf::sync() {
 	fd_set wfds;
 	int nfds;
     std::ptrdiff_t n;
+    int fd;
 
     n = pptr() - pbase();
 
     if ( 0 == n ) {
     	r = EXIT_SUCCESS;
     }
+
+    fd = getFd();
 
     FD_ZERO( & rfds );
     FD_SET( sv[ fdostreambuf::INTERRUPTEE ], & rfds );
@@ -141,36 +132,4 @@ rethrow:
     r = EXIT_SUCCESS;
 
     return r;
-}
-
-fdostreambuf & fdostreambuf::operator=( const fdostreambuf & other ) {
-
-	char_type *base;
-	char_type *obase;
-
-	char_type *opptr;
-	char_type *oepptr;
-
-	if ( & other == this ) {
-		goto out;
-	}
-
-	fd = other.fd;
-
-	buffer.clear();
-
-	// XXX: FIXME: copy the contents of the other buffer, and determine proper offsets with
-	// setp(). Use this and other's pbase(), pptr() and epptr()
-	buffer.insert( std::end( buffer ), std::begin( other.buffer ), std::end( other.buffer ) );
-
-	base = &buffer.front();
-	obase = (char_type *) &other.buffer.front();
-
-	opptr = other.pptr();
-	oepptr = other.epptr();
-
-	setp( base + (opptr - obase), base + (oepptr - obase) - 1 );
-
-out:
-	return *this;
 }

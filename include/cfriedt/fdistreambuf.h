@@ -39,24 +39,11 @@ class fdistreambuf : public fdstreambuf {
 
 public:
 
-	fdistreambuf( int fd, std::size_t buffer_size = 256, std::size_t put_back = 8 );
+	fdistreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in );
 	virtual ~fdistreambuf();
 
-    fdistreambuf & operator=( const fdistreambuf & other );
-
 protected:
-	const std::size_t put_back;
-
 	int_type underflow();
-
-private:
-    // copy ctor and assignment not implemented;
-    fdistreambuf( const fdistreambuf & );
-
-    enum {
-    	INTERRUPTEE,
-		INTERRUPTOR,
-    };
 };
 
 }

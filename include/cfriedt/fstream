@@ -92,7 +92,7 @@ protected:
     virtual int sync();
     virtual void imbue(const std::locale& __loc);
 
-private:
+//private:
     char*       __extbuf_;
     const char* __extbufnext_;
     const char* __extbufend_;

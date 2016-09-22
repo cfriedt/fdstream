@@ -36,7 +36,7 @@ namespace cfriedt {
 class fdstreambuf : public ::com::github::cfriedt::filebuf {
 
 public:
-	fdstreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out, std::size_t buffer_size = 256 );
+	fdstreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out | std::ios_base::binary, std::size_t buffer_size = 256 );
 	virtual ~fdstreambuf() = 0;
 
 	void interrupt();

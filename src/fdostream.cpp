@@ -27,6 +27,7 @@
 #include "cfriedt/fdostream.h"
 
 using std::size_t;
+using ::com::github::cfriedt::ofstream;
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
@@ -34,9 +35,9 @@ using namespace ::com::github::cfriedt;
 fdostream::fdostream( int fd, std::ios_base::openmode mode, bool auto_close )
 :
 	ios( 0 ),
-	ostream( & buf ),
+	ofstream( buf ),
 	fdstream( auto_close ),
-	buf( fd, mode )
+	buf( fd, ( mode & ~std::ios_base::in ) | std::ios_base::out | std::ios_base::binary )
 {
 }
 

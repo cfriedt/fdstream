@@ -75,6 +75,7 @@ void SocketPairTest::interrupt_cb() {
 	os.interrupt();
 }
 
+/*
 TEST_F( SocketPairTest, PassMessage ) {
 
 	std::string tx_msg = "Hi there!";
@@ -91,6 +92,7 @@ TEST_F( SocketPairTest, PassMessage ) {
 
 	EXPECT_EQ( tx_msg, rx_msg );
 }
+*/
 
 TEST_F( SocketPairTest, PassBinary ) {
 

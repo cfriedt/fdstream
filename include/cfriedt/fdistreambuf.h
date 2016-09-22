@@ -38,7 +38,7 @@ class fdistreambuf : public fdstreambuf {
 
 public:
 
-	fdistreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in, std::size_t buffer_size = 256, std::size_t put_back_size = 8 );
+	fdistreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::binary, std::size_t buffer_size = 256, std::size_t put_back_size = 8 );
 	virtual ~fdistreambuf();
 
 protected:

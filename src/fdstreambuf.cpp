@@ -37,7 +37,7 @@ using namespace ::com::github::cfriedt;
 
 fdstreambuf::fdstreambuf( int fd, std::ios_base::openmode mode, size_t buffer_size  )
 :
-	filebuf( fd, mode ),
+	filebuf( fd, mode | std::ios_base::binary ),
 	buffer( std::max( buffer_size, (size_t) 1 ) )
 {
 }

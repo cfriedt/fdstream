@@ -34,10 +34,10 @@ namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdostream : public std::ostream, public fdstream {
+class fdostream : public ::com::github::cfriedt::ofstream, public fdstream {
 
 public:
-	fdostream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out, bool auto_close = false );
+	fdostream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out | std::ios_base::binary, bool auto_close = false );
 	virtual ~fdostream();
 
 	fdostream & operator=( fdostream && __rhs );

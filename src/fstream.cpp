@@ -831,6 +831,14 @@ ifstream::ifstream()
 {
 }
 
+ifstream::ifstream( filebuf & buf )
+:
+	__sb_( buf ),
+	std::istream( __sb_ )
+{
+
+}
+
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
 
 ifstream::ifstream(const char* __s, std::ios_base::openmode __mode)
@@ -935,6 +943,14 @@ ifstream::close()
 ofstream::ofstream()
     : std::ostream(&__sb_)
 {
+}
+
+ofstream::ofstream( filebuf & buf )
+:
+	__sb_( buf ),
+	std::ostream( __sb_ )
+{
+
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE

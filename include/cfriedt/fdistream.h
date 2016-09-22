@@ -25,8 +25,7 @@
 #ifndef com_github_cfriedt_fdistream_h_
 #define com_github_cfriedt_fdistream_h_
 
-#include <istream>
-
+#include "cfriedt/fstream"
 #include "cfriedt/fdstream.h"
 #include "cfriedt/fdistreambuf.h"
 
@@ -34,10 +33,10 @@ namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdistream : public std::istream, public fdstream {
+class fdistream : public ::com::github::cfriedt::ifstream, public fdstream {
 
 public:
-	fdistream( int fd = -1, std::ios_base::openmode mode = std::ios_base::in, bool auto_close = false, std::size_t buffer_size = 256, std::size_t put_back_size = 8 );
+	fdistream( int fd = -1, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::binary, bool auto_close = false, std::size_t buffer_size = 256, std::size_t put_back_size = 8 );
 	virtual ~fdistream();
 
 	fdistream & operator=( fdistream && __rhs );

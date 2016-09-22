@@ -37,7 +37,7 @@ class fdostreambuf : public fdstreambuf {
 
 public:
 
-	fdostreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::out );
+	fdostreambuf( int fd = -1, std::ios_base::openmode mode = std::ios_base::out | std::ios_base::binary );
 	virtual ~fdostreambuf();
 
 protected:

@@ -40,7 +40,7 @@ using namespace ::com::github::cfriedt;
 
 fdistreambuf::fdistreambuf( int fd, std::ios_base::openmode mode, size_t buffer_size, size_t put_back_size )
 :
-	fdstreambuf( fd, mode, buffer_size ),
+	fdstreambuf( fd, ( mode & ~std::ios_base::out ) | std::ios_base::in | std::ios_base::binary, buffer_size ),
 	put_back( ::max( put_back_size, (size_t)1 ) )
 {
 	char_type *end;

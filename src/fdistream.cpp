@@ -22,9 +22,11 @@
  * SOFTWARE.
  */
 
+#include "cfriedt/fstream"
 #include "cfriedt/fdistream.h"
 
 using std::size_t;
+using ::com::github::cfriedt::ifstream;
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
@@ -32,9 +34,9 @@ using namespace ::com::github::cfriedt;
 fdistream::fdistream( int fd, std::ios_base::openmode mode, bool auto_close, size_t buffer_size, size_t put_back_size )
 :
 	std::ios( 0 ),
-	std::istream( & buf ),
+	ifstream( buf ),
 	fdstream( auto_close ),
-	buf( fd, mode, buffer_size, put_back_size )
+	buf( fd, ( mode & ~std::ios_base::out ) | std::ios_base::in | std::ios_base::binary, buffer_size, put_back_size )
 {
 }
 

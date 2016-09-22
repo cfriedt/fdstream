@@ -41,7 +41,7 @@ using namespace ::com::github::cfriedt;
 
 fdostreambuf::fdostreambuf( int fd, std::ios_base::openmode mode )
 :
-	fdstreambuf( fd, mode )
+	fdstreambuf( fd, ( mode & ~std::ios_base::in ) | std::ios_base::out | std::ios_base::binary )
 {
 	char_type *base;
 

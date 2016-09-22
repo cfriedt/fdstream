@@ -96,6 +96,8 @@ TEST_F( SocketPairTest, PassMessage ) {
 	try {
 		os << tx_msg;
 		os.flush();
+		// Note, std::string overloads the >> operator, and tokenizes string
+		// input by default, which is why is.read() must be used instead
 		is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
 		rx_msg = std::string( rx_msg_buf );
 

@@ -77,19 +77,14 @@ TEST_F( FileStreamTest, PassMessage ) {
 	char rx_msg_buf[ 64 ];
 	std::string rx_msg;
 
-	try {
-		os << tx_msg;
-		os.flush();
-		// Note, std::string overloads the >> operator, and tokenizes string
-		// input by default, which is why is.read() must be used instead
-		is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
-		rx_msg = std::string( rx_msg_buf );
+	os << tx_msg;
+	os.flush();
+	// Note, std::string overloads the >> operator, and tokenizes string
+	// input by default, which is why is.read() must be used instead
+	is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
+	rx_msg = std::string( rx_msg_buf );
 
-		EXPECT_EQ( tx_msg, rx_msg );
-
-	} catch( ... ) {
-		EXPECT_EQ( true, false );
-	}
+	EXPECT_EQ( tx_msg, rx_msg );
 }
 
 TEST_F( FileStreamTest, PassBinary ) {
@@ -97,14 +92,9 @@ TEST_F( FileStreamTest, PassBinary ) {
 	uint16_t tx_msg = 0x7e57;
 	uint16_t rx_msg;
 
-	try {
-		os << tx_msg;
-		os.flush();
-		is >> rx_msg;
+	os << tx_msg;
+	os.flush();
+	is >> rx_msg;
 
-		EXPECT_EQ( tx_msg, rx_msg );
-
-	} catch( ... ) {
-		EXPECT_EQ( true, false );
-	}
+	EXPECT_EQ( tx_msg, rx_msg );
 }

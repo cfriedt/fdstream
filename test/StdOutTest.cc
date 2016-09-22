@@ -24,6 +24,8 @@
 
 #include <cstdio>
 
+#include <unistd.h>
+
 #include <gtest/gtest.h>
 
 #include "cfriedt/fdostream.h"
@@ -52,7 +54,8 @@ StdOutTest::~StdOutTest() {
 }
 
 void StdOutTest::SetUp() {
-	os = fdostream( STDOUT_FILENO );
+	// XXX: use dup(2) so that we don't inadvertantly close the last reference to stdout
+	os = fdostream( ::dup( STDOUT_FILENO ) );
 }
 
 void StdOutTest::TearDown() {

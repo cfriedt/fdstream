@@ -29,17 +29,16 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-using ::std::size_t;
 using ::com::github::cfriedt::filebuf;
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdstreambuf::fdstreambuf( int fd, std::ios_base::openmode mode, size_t buffer_size  )
+fdstreambuf::fdstreambuf( int fd, std::ios_base::openmode mode, std::streamsize buffer_size  )
 :
-	filebuf( fd, mode | std::ios_base::binary ),
-	buffer( std::max( buffer_size, (size_t) 1 ) )
+	filebuf( fd, mode )
 {
+	setbuf( 0, buffer_size );
 }
 
 fdstreambuf::~fdstreambuf() {
@@ -48,8 +47,99 @@ fdstreambuf::~fdstreambuf() {
 
 void fdstreambuf::swap( fdstreambuf & __rhs ) {
     filebuf::swap( __rhs );
-    buffer.swap( __rhs.buffer );
 }
+
+int fdstreambuf::sync() {
+
+	int r;
+
+	fd_set rfds;
+	fd_set wfds;
+	int nfds;
+    std::ptrdiff_t n;
+    int fd;
+
+    n = pptr() - pbase();
+
+    if ( 0 == n ) {
+    	r = EXIT_SUCCESS;
+    }
+
+    fd = get_fd();
+
+    setup_interrupt_fds();
+
+    FD_ZERO( & rfds );
+    FD_SET( sv[ fdstreambuf::INTERRUPTEE ], & rfds );
+
+    FD_ZERO( & rfds );
+    FD_SET( fd, & wfds );
+
+    nfds = ::max( fd, sv[ fdstreambuf::INTERRUPTEE ] ) + 1;
+
+    r = ::select( nfds, & rfds, & wfds, NULL, NULL );
+rethrow:
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+	if ( 0 == r ) {
+		errno = EAGAIN;
+		r = -1;
+		goto rethrow;
+	}
+	if ( FD_ISSET( sv[ fdstreambuf::INTERRUPTEE ], & rfds ) ) {
+		errno = EINTR;
+		r = -1;
+		goto rethrow;
+	}
+	if ( ! FD_ISSET( fd, & wfds ) ) {
+		errno = EAGAIN;
+		r = -1;
+		goto rethrow;
+	}
+
+	return filebuf::sync();
+}
+
+int fdstreambuf::underflow() {
+	int r;
+	int nfds;
+	fd_set rfds;
+
+	int fd;
+
+	fd = get_fd();
+	setup_interrupt_fds();
+
+	FD_ZERO( & rfds );
+	FD_SET( fd, & rfds );
+	FD_SET( sv[ fdstreambuf::INTERRUPTEE ], & rfds );
+	nfds = ::max( fd, sv[ fdstreambuf::INTERRUPTEE ] ) + 1;
+
+	r = ::select( nfds, & rfds, NULL, NULL, NULL );
+rethrow:
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+	if ( 0 == r ) {
+		errno = EAGAIN;
+		r = -1;
+		goto rethrow;
+	}
+	if ( FD_ISSET( sv[ fdstreambuf::INTERRUPTEE ], & rfds ) ) {
+		errno = EINTR;
+		r = -1;
+		goto rethrow;
+	}
+	if ( ! FD_ISSET( fd, & rfds ) ) {
+		errno = EAGAIN;
+		r = -1;
+		goto rethrow;
+	}
+
+	return filebuf::underflow();
+}
+
 
 void fdstreambuf::interrupt() {
 	int r;

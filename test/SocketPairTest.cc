@@ -30,7 +30,10 @@
 
 #include <gtest/gtest.h>
 
-#include "cfriedt/fdstream.h"
+#include "cfriedt/fdstreambuf.h"
+#include "cfriedt/fdostream.h"
+#include "cfriedt/fdistream.h"
+#include "cfriedt/fstream"
 
 #include "BaseTest.h"
 
@@ -66,8 +69,10 @@ void SocketPairTest::SetUpVirt() {
 		throw std::system_error( errno, std::system_category() );
 	}
 
-	os = fdostream( sv[ CLIENT ] );
-	is = fdistream( sv[ SERVER ] );
+	;
+
+	os = fdostream( sv[ CLIENT ], std::ios_base::out | std::ios_base::binary );
+	is = fdistream( sv[ SERVER ], std::ios_base::in | std::ios_base::binary );
 }
 
 void SocketPairTest::interrupt_cb() {

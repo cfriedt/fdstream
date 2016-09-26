@@ -831,10 +831,10 @@ ifstream::ifstream()
 {
 }
 
-ifstream::ifstream( filebuf & buf )
+ifstream::ifstream( filebuf *buf )
 :
-	__sb_( buf ),
-	std::istream( __sb_ )
+//	__sb_( *buf ),
+	std::istream( & __sb_ )
 {
 
 }
@@ -947,8 +947,8 @@ ofstream::ofstream()
 
 ofstream::ofstream( filebuf & buf )
 :
-	__sb_( buf ),
-	std::ostream( __sb_ )
+//	__sb_( buf ),
+	std::ostream( & __sb_ )
 {
 
 }
@@ -1055,6 +1055,11 @@ ofstream::close()
 // fstream
 
 fstream::fstream()
+    : std::iostream(&__sb_)
+{
+}
+
+fstream::fstream( filebuf *buf )
     : std::iostream(&__sb_)
 {
 }

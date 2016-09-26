@@ -25,28 +25,37 @@
 #ifndef com_github_cfriedt_fdostream_h_
 #define com_github_cfriedt_fdostream_h_
 
-#include <ostream>
-
-#include "cfriedt/fdstream.h"
-#include "cfriedt/fdostreambuf.h"
+#include "cfriedt/fstream"
+#include "cfriedt/fdstreambuf.h"
 
 namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdostream : public ::com::github::cfriedt::ofstream, public fdstream {
+class fdostream : public ::com::github::cfriedt::ofstream {
 
 public:
-	fdostream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out | std::ios_base::binary, bool auto_close = false );
-	virtual ~fdostream();
+	fdostream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out )
+	:
+		buf( fd, mode )
+	{
+	}
+	virtual ~fdostream() {}
 
-	fdostream & operator=( fdostream && __rhs );
+	fdostream & operator=( fdostream && __rhs ) {
+		buf.swap( __rhs.buf );
+		return *this;
+	}
+
+	void interrupt() {
+		buf.interrupt();
+	}
 
 protected:
 	fdstreambuf &getBuf();
 
 private:
-	fdostreambuf buf;
+	fdstreambuf buf;
 
 };
 

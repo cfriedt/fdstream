@@ -35,7 +35,7 @@ namespace cfriedt {
 class fdistream : public ::com::github::cfriedt::ifstream {
 
 public:
-	fdistream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out )
+	fdistream( int fd = -1, std::ios::openmode mode = std::ios::out )
 	:
 		ifstream( & buf ),
 		buf( fd, mode )

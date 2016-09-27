@@ -23,6 +23,10 @@
  * SOFTWARE.
  */
 
+     #include <sys/types.h>
+     #include <sys/uio.h>
+     #include <unistd.h>
+
 #include <cfriedt/fstream.h>
 
 using namespace ::com::github::cfriedt;
@@ -602,8 +606,10 @@ filebuf::underflow()
         memmove(this->eback(), this->egptr() - __unget_sz, __unget_sz * sizeof(char_type));
         if (__always_noconv_)
         {
-            size_t __nmemb = static_cast<size_t>(this->egptr() - this->eback() - __unget_sz);
-            __nmemb = fread(this->eback() + __unget_sz, 1, __nmemb, __file_);
+            ssize_t __nmemb = static_cast<size_t>(this->egptr() - this->eback() - __unget_sz);
+            // XXX: @CF: At least on Mac OS X, fread(3) will block until it gets all __nmemb, but read(2) can and does return fewer (which is what we want)
+            //__nmemb = fread(this->eback() + __unget_sz, 1, __nmemb, __file_);
+            __nmemb = read( __file_fd_, this->eback() + __unget_sz, __nmemb );
             if (__nmemb != 0)
             {
                 this->setg(this->eback(),

@@ -68,17 +68,16 @@ void SocketPairTest::SetUpVirt() {
 		throw std::system_error( errno, std::system_category() );
 	}
 
-	;
-
-	os = fdostream( sv[ CLIENT ], std::ios_base::out | std::ios_base::binary );
-	is = fdistream( sv[ SERVER ], std::ios_base::in | std::ios_base::binary );
+	os = fdostream( sv[ CLIENT ] );
+	is = fdistream( sv[ SERVER ] );
 }
 
 void SocketPairTest::interrupt_cb() {
-//	is.interrupt();
-//	os.interrupt();
+	is.interrupt();
+	os.interrupt();
 }
 
+/*
 TEST_F( SocketPairTest, PassMessage ) {
 
 	std::string tx_msg = "Hi there!";
@@ -95,6 +94,7 @@ TEST_F( SocketPairTest, PassMessage ) {
 
 	EXPECT_EQ( tx_msg, rx_msg );
 }
+*/
 
 TEST_F( SocketPairTest, PassBinary ) {
 

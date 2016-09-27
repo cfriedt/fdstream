@@ -63,8 +63,6 @@ void FileStreamTest::SetUp() {
 
 	temp_file_name = ::tmpnam( NULL );
 
-//	os = ofstream( temp_file_name, std::fstream::binary );
-//	is = ifstream( temp_file_name, std::fstream::binary );
 	os = ofstream( temp_file_name );
 	is = ifstream( temp_file_name );
 }

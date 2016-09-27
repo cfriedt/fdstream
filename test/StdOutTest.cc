@@ -54,9 +54,35 @@ void StdOutTest::SetUpVirt() {
 }
 
 void StdOutTest::interrupt_cb() {
-	os.interrupt();
+//	os.interrupt();
+}
+
+TEST_F( StdOutTest, IsCorrectFileNo ) {
+	int expected_int;
+	int actual_int;
+
+	expected_int = STDOUT_FILENO;
+	actual_int = ( (fdstreambuf *) os.rdbuf() )->get_fd();
+
+	EXPECT_EQ( expected_int, actual_int );
+}
+
+TEST_F( StdOutTest, IsOpen ) {
+	bool expected_bool;
+	bool actual_bool;
+
+	expected_bool = true;
+	actual_bool = os.is_open();
+
+	EXPECT_EQ( expected_bool, actual_bool );
 }
 
 TEST_F( StdOutTest, WriteHelloWorld ) {
+	const std::string str = "Hello, World!";
+//	const char *cstr = str.c_str();
+//	const std::size_t strsz = str.length();
+//	os.write( cstr, strsz );
+//	os << endl;
+//	os.flush();
 	os << "Hello, World!" << std::endl;
 }

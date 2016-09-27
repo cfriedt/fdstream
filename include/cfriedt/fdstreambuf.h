@@ -45,6 +45,7 @@ public:
 	void swap( fdstreambuf & __rhs );
 
 	int_type underflow();
+	int_type overflow( int_type ch );
 	int sync();
 
 protected:

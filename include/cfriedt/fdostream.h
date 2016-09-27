@@ -37,12 +37,16 @@ class fdostream : public ::com::github::cfriedt::ofstream {
 public:
 	fdostream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out )
 	:
+		basic_ios( 0 ),
+		ofstream(),
 		buf( fd, mode )
 	{
+		::com::github::cfriedt::ofstream::rdbuf( & buf );
 	}
 	virtual ~fdostream() {}
 
 	fdostream & operator=( fdostream && __rhs ) {
+		ofstream::swap( __rhs );
 		buf.swap( __rhs.buf );
 		return *this;
 	}
@@ -52,11 +56,7 @@ public:
 	}
 
 protected:
-	fdstreambuf &getBuf();
-
-private:
 	fdstreambuf buf;
-
 };
 
 }

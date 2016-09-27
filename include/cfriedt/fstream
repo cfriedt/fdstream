@@ -186,7 +186,7 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     ofstream();
     _LIBCPP_INLINE_VISIBILITY
-    ofstream( filebuf & buf );
+    ofstream( filebuf *buf );
     _LIBCPP_INLINE_VISIBILITY
     explicit ofstream(const char* __s, std::ios_base::openmode __mode = std::ios_base::out);
     _LIBCPP_INLINE_VISIBILITY
@@ -205,6 +205,8 @@ public:
 
     _LIBCPP_INLINE_VISIBILITY
     filebuf* rdbuf() const;
+    _LIBCPP_INLINE_VISIBILITY
+    filebuf* rdbuf( filebuf* __sb );
     _LIBCPP_INLINE_VISIBILITY
     bool is_open() const;
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE

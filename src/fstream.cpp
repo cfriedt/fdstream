@@ -833,10 +833,9 @@ ifstream::ifstream()
 
 ifstream::ifstream( filebuf *buf )
 :
-//	__sb_( *buf ),
 	std::istream( & __sb_ )
 {
-
+	__sb_ = std::move( *buf );
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
@@ -945,12 +944,11 @@ ofstream::ofstream()
 {
 }
 
-ofstream::ofstream( filebuf & buf )
+ofstream::ofstream( filebuf *buf )
 :
-//	__sb_( buf ),
 	std::ostream( & __sb_ )
 {
-
+	__sb_ = _VSTD::move( *buf );
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
@@ -1013,6 +1011,13 @@ filebuf*
 ofstream::rdbuf() const
 {
     return const_cast<filebuf*>(&__sb_);
+}
+
+filebuf*
+ofstream::rdbuf( filebuf* __sb )
+{
+    __sb_ = std::move( *__sb );
+    return & __sb_;
 }
 
 

@@ -101,6 +101,48 @@ rethrow:
 	return filebuf::sync();
 }
 
+
+fdstreambuf::int_type fdstreambuf::overflow( int_type ch ) {
+	int r;
+	int nfds;
+	fd_set rfds;
+	fd_set wfds;
+
+	int fd;
+
+	fd = get_fd();
+	setup_interrupt_fds();
+
+	FD_ZERO( & wfds );
+	FD_ZERO( & rfds );
+	FD_SET( fd, & wfds );
+	FD_SET( sv[ fdstreambuf::INTERRUPTEE ], & rfds );
+	nfds = ::max( fd, sv[ fdstreambuf::INTERRUPTEE ] ) + 1;
+
+	r = ::select( nfds, & rfds, & wfds, NULL, NULL );
+rethrow:
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+	if ( 0 == r ) {
+		errno = EAGAIN;
+		r = -1;
+		goto rethrow;
+	}
+	if ( FD_ISSET( sv[ fdstreambuf::INTERRUPTEE ], & rfds ) ) {
+		errno = EINTR;
+		r = -1;
+		goto rethrow;
+	}
+	if ( ! FD_ISSET( fd, & rfds ) ) {
+		errno = EAGAIN;
+		r = -1;
+		goto rethrow;
+	}
+
+	return filebuf::underflow();
+}
+
 int fdstreambuf::underflow() {
 	int r;
 	int nfds;

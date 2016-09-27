@@ -45,7 +45,7 @@ public:
 	virtual void TearDown() final;
 
 	virtual void interrupt_cb() {}
-	virtual size_t interrupt_delay_ms() { return 250; }
+	virtual size_t interrupt_delay_ms() { return 1000; }
 
 private:
 	thread interrupt_th;

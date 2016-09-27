@@ -75,8 +75,8 @@ void SocketPairTest::SetUpVirt() {
 }
 
 void SocketPairTest::interrupt_cb() {
-	is.interrupt();
-	os.interrupt();
+//	is.interrupt();
+//	os.interrupt();
 }
 
 TEST_F( SocketPairTest, PassMessage ) {

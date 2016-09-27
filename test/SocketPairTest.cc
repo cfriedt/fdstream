@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include <cfriedt/fstream.h>
 #include <cstdio>
 #include <thread>
 
@@ -33,8 +34,6 @@
 #include "cfriedt/fdstreambuf.h"
 #include "cfriedt/fdostream.h"
 #include "cfriedt/fdistream.h"
-#include "cfriedt/fstream"
-
 #include "BaseTest.h"
 
 using namespace ::std;

@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-#include "cfriedt/fstream"
+#include <cfriedt/fstream.h>
 
 using namespace ::com::github::cfriedt;
 

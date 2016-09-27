@@ -216,7 +216,8 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     void close();
 
-private:
+//private:
+protected:
     filebuf __sb_;
 };
 
@@ -267,7 +268,8 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     void close();
 
-private:
+//private:
+protected:
     filebuf __sb_;
 };
 

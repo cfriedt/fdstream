@@ -27,7 +27,7 @@
 
 #include <vector>
 
-#include "cfriedt/fstream"
+#include "fstream.h"
 
 namespace com {
 namespace github {

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "cfriedt/fstream"
+#include <cfriedt/fstream.h>
 #include "cfriedt/fdstreambuf.h"
 
 #include <errno.h>

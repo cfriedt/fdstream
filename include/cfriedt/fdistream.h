@@ -25,8 +25,8 @@
 #ifndef com_github_cfriedt_fdistream_h_
 #define com_github_cfriedt_fdistream_h_
 
-#include "cfriedt/fstream"
 #include "cfriedt/fdstreambuf.h"
+#include "fstream.h"
 
 namespace com {
 namespace github {

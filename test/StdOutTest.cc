@@ -78,11 +78,22 @@ TEST_F( StdOutTest, IsOpen ) {
 }
 
 TEST_F( StdOutTest, WriteHelloWorld ) {
-	const std::string str = "Hello, World!";
-//	const char *cstr = str.c_str();
-//	const std::size_t strsz = str.length();
-//	os.write( cstr, strsz );
-//	os << endl;
+
+	bool expected_bool;
+	bool actual_bool;
+
+	const std::string str = "Hello, World!\n";
+	const char *cstr = str.c_str();
+	const std::size_t strsz = str.length();
+	os.write( cstr, strsz );
+	os.flush();
+
+//	::write( STDOUT_FILENO, cstr, strsz );
+
+	expected_bool = false;
+	actual_bool = os.badbit;
+	EXPECT_EQ( expected_bool, actual_bool );
+
+//	os << str;
 //	os.flush();
-	os << "Hello, World!" << std::endl;
 }

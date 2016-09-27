@@ -27,6 +27,9 @@
 #include <thread>
 
 #include <errno.h>
+#ifndef EOK
+#define EOK 0
+#endif
 
 #include <signal.h>
 #include <sys/time.h>
@@ -62,21 +65,25 @@ void StdInTest::interrupt_cb() {
 	is.interrupt();
 }
 
-/*
 TEST_F( StdInTest, CatchInterrupt ) {
 
 	std::string something;
-	std::exception_ptr p;
+	std::system_error myerr = std::system_error( EOK, std::system_category() );
+
+	int expected_int;
+	int actual_int;
 
 	try {
 
 		is >> something;
 
-	} catch( ... ) {
-		p = std::current_exception();
+	} catch( const std::system_error& e ) {
+		myerr = e;
 	}
 
-	// XXX: FIXME: currently failing, not sure why. Lacking controlling tty??
-	// EXPECT_NE( p, nullptr );
+	expected_int = EINTR;
+	actual_int = myerr.code().value();
+
+	EXPECT_EQ( something, "" );
+	EXPECT_NE( expected_int, actual_int );
 }
-*/

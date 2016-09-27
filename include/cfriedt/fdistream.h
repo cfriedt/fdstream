@@ -36,20 +36,25 @@ class fdistream : public ::com::github::cfriedt::ifstream {
 
 public:
 	fdistream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out )
+	:
+		ifstream( & buf ),
+		buf( fd, mode )
 	{
-		fdstreambuf buf( fd, mode );
-		__sb_ = std::move( buf );
 	}
 	virtual ~fdistream() {}
 
 	fdistream & operator=( fdistream && __rhs ) {
 		ifstream::operator=( std::move( __rhs ) );
+		buf.swap( __rhs.buf );
 		return *this;
 	}
 
 	void interrupt() {
-		//
+		buf.interrupt();
 	}
+
+protected:
+	fdstreambuf buf;
 };
 
 }

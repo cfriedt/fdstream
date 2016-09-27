@@ -199,6 +199,12 @@ filebuf::filebuf( int fd, std::ios_base::openmode __mode )
 
 		}
 	}
+    if (std::has_facet<std::codecvt<char_type, char, mbstate_t> >(this->getloc()))
+    {
+        __cv_ = &std::use_facet<std::codecvt<char_type, char, mbstate_t> >(this->getloc());
+        __always_noconv_ = __cv_->always_noconv();
+    }
+    setbuf(0, 4096);
 }
 
 #ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
@@ -833,9 +839,8 @@ ifstream::ifstream()
 
 ifstream::ifstream( filebuf *buf )
 :
-	std::istream( & __sb_ )
+	std::istream( buf )
 {
-	__sb_ = std::move( *buf );
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
@@ -843,7 +848,7 @@ ifstream::ifstream( filebuf *buf )
 ifstream::ifstream(const char* __s, std::ios_base::openmode __mode)
 	: std::istream(&__sb_)
 {
-    if (__sb_.open(__s, __mode | std::ios_base::in) == 0)
+    if (rdbuf()->open(__s, __mode | std::ios_base::in) == 0)
         this->setstate(ios_base::failbit);
 }
 
@@ -851,7 +856,7 @@ ifstream::ifstream(const char* __s, std::ios_base::openmode __mode)
 ifstream::ifstream(const std::string& __s, std::ios_base::openmode __mode)
     : std::istream(&__sb_)
 {
-    if (__sb_.open(__s, __mode | std::ios_base::in) == 0)
+    if (rdbuf()->open(__s, __mode | std::ios_base::in) == 0)
         this->setstate(ios_base::failbit);
 }
 #endif
@@ -882,7 +887,7 @@ void
 ifstream::swap(ifstream& __rhs)
 {
     std::istream::swap(__rhs);
-    __sb_.swap(__rhs.__sb_);
+    rdbuf()->swap(__rhs.__sb_);
 }
 
 
@@ -893,18 +898,16 @@ swap(ifstream& __x, ifstream& __y)
     __x.swap(__y);
 }
 
-
 filebuf*
-ifstream::rdbuf() const
+ifstream::rdbuf()  const
 {
-    return const_cast<filebuf*>(&__sb_);
+	return (filebuf *)std::istream::rdbuf();
 }
-
 
 bool
 ifstream::is_open() const
 {
-    return __sb_.is_open();
+    return rdbuf()->is_open();
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
@@ -912,7 +915,7 @@ ifstream::is_open() const
 void
 ifstream::open(const char* __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode | std::ios_base::in))
+    if (rdbuf()->open(__s, __mode | std::ios_base::in))
         this->clear();
     else
         this->setstate(ios_base::failbit);
@@ -922,7 +925,7 @@ ifstream::open(const char* __s, std::ios_base::openmode __mode)
 void
 ifstream::open(const std::string& __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode | std::ios_base::in))
+    if (rdbuf()->open(__s, __mode | std::ios_base::in))
         this->clear();
     else
         this->setstate(ios_base::failbit);
@@ -933,7 +936,7 @@ ifstream::open(const std::string& __s, std::ios_base::openmode __mode)
 void
 ifstream::close()
 {
-    if (__sb_.close() == 0)
+    if (rdbuf()->close() == 0)
         this->setstate(ios_base::failbit);
 }
 
@@ -945,10 +948,9 @@ ofstream::ofstream()
 }
 
 ofstream::ofstream( filebuf *buf )
-:
-	std::ostream( & __sb_ )
+	: std::ostream(&__sb_)
 {
-	__sb_ = _VSTD::move( *buf );
+	std::ostream::rdbuf( buf );
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
@@ -956,7 +958,7 @@ ofstream::ofstream( filebuf *buf )
 ofstream::ofstream(const char* __s, std::ios_base::openmode __mode)
     : std::ostream(&__sb_)
 {
-    if (__sb_.open(__s, __mode | std::ios_base::out) == 0)
+    if (rdbuf()->open(__s, __mode | std::ios_base::out) == 0)
         this->setstate(ios_base::failbit);
 }
 
@@ -964,7 +966,7 @@ ofstream::ofstream(const char* __s, std::ios_base::openmode __mode)
 ofstream::ofstream(const std::string& __s, std::ios_base::openmode __mode)
     : std::ostream(&__sb_)
 {
-    if (__sb_.open(__s, __mode | std::ios_base::out) == 0)
+    if (rdbuf()->open(__s, __mode | std::ios_base::out) == 0)
         this->setstate(ios_base::failbit);
 }
 #endif
@@ -995,7 +997,7 @@ void
 ofstream::swap(ofstream& __rhs)
 {
 	std::ostream::swap(__rhs);
-    __sb_.swap(__rhs.__sb_);
+    rdbuf()->swap(__rhs.__sb_);
 }
 
 
@@ -1010,21 +1012,15 @@ swap(ofstream& __x, ofstream& __y)
 filebuf*
 ofstream::rdbuf() const
 {
-    return const_cast<filebuf*>(&__sb_);
+	return (filebuf *)std::ostream::rdbuf();
 }
-
-filebuf*
-ofstream::rdbuf( filebuf* __sb )
-{
-    __sb_ = std::move( *__sb );
-    return & __sb_;
-}
-
 
 bool
 ofstream::is_open() const
 {
-    return __sb_.is_open();
+	filebuf *sb = rdbuf();
+	const bool r = sb->is_open();
+    return r;
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
@@ -1032,7 +1028,7 @@ ofstream::is_open() const
 void
 ofstream::open(const char* __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode | std::ios_base::out))
+    if (rdbuf()->open(__s, __mode | std::ios_base::out))
         this->clear();
     else
         this->setstate(ios_base::failbit);
@@ -1042,7 +1038,7 @@ ofstream::open(const char* __s, std::ios_base::openmode __mode)
 void
 ofstream::open(const std::string& __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode | std::ios_base::out))
+    if (rdbuf()->open(__s, __mode | std::ios_base::out))
         this->clear();
     else
         this->setstate(ios_base::failbit);
@@ -1053,7 +1049,7 @@ ofstream::open(const std::string& __s, std::ios_base::openmode __mode)
 void
 ofstream::close()
 {
-    if (__sb_.close() == 0)
+    if (rdbuf()->close() == 0)
         this->setstate(ios_base::failbit);
 }
 
@@ -1065,7 +1061,7 @@ fstream::fstream()
 }
 
 fstream::fstream( filebuf *buf )
-    : std::iostream(&__sb_)
+    : std::iostream( buf )
 {
 }
 
@@ -1074,7 +1070,7 @@ fstream::fstream( filebuf *buf )
 fstream::fstream(const char* __s, std::ios_base::openmode __mode)
     : std::iostream(&__sb_)
 {
-    if (__sb_.open(__s, __mode) == 0)
+    if (rdbuf()->open(__s, __mode) == 0)
         this->setstate(ios_base::failbit);
 }
 
@@ -1082,7 +1078,7 @@ fstream::fstream(const char* __s, std::ios_base::openmode __mode)
 fstream::fstream(const std::string& __s, std::ios_base::openmode __mode)
     : std::iostream(&__sb_)
 {
-    if (__sb_.open(__s, __mode) == 0)
+    if (rdbuf()->open(__s, __mode) == 0)
         this->setstate(ios_base::failbit);
 }
 #endif
@@ -1113,7 +1109,7 @@ void
 fstream::swap(fstream& __rhs)
 {
     std::iostream::swap(__rhs);
-    __sb_.swap(__rhs.__sb_);
+    rdbuf()->swap(__rhs.__sb_);
 }
 
 
@@ -1124,18 +1120,16 @@ swap(fstream& __x, fstream& __y)
     __x.swap(__y);
 }
 
-
 filebuf*
 fstream::rdbuf() const
 {
-    return const_cast<filebuf*>(&__sb_);
+    return (filebuf*) std::iostream::rdbuf();
 }
-
 
 bool
 fstream::is_open() const
 {
-    return __sb_.is_open();
+    return rdbuf()->is_open();
 }
 
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
@@ -1143,7 +1137,7 @@ fstream::is_open() const
 void
 fstream::open(const char* __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode))
+    if (rdbuf()->open(__s, __mode))
         this->clear();
     else
         this->setstate(ios_base::failbit);
@@ -1153,7 +1147,7 @@ fstream::open(const char* __s, std::ios_base::openmode __mode)
 void
 fstream::open(const std::string& __s, std::ios_base::openmode __mode)
 {
-    if (__sb_.open(__s, __mode))
+    if (rdbuf()->open(__s, __mode))
         this->clear();
     else
         this->setstate(ios_base::failbit);
@@ -1164,6 +1158,6 @@ fstream::open(const std::string& __s, std::ios_base::openmode __mode)
 void
 fstream::close()
 {
-    if (__sb_.close() == 0)
+    if (rdbuf()->close() == 0)
         this->setstate(ios_base::failbit);
 }

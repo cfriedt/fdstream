@@ -54,7 +54,7 @@ void StdOutTest::SetUpVirt() {
 }
 
 void StdOutTest::interrupt_cb() {
-//	os.interrupt();
+	os.interrupt();
 }
 
 TEST_F( StdOutTest, IsCorrectFileNo ) {
@@ -82,18 +82,9 @@ TEST_F( StdOutTest, WriteHelloWorld ) {
 	bool expected_bool;
 	bool actual_bool;
 
-	const std::string str = "Hello, World!\n";
-	const char *cstr = str.c_str();
-	const std::size_t strsz = str.length();
-	os.write( cstr, strsz );
-	os.flush();
+	os << "Hello, World!" << std::endl << std::flush;
 
-//	::write( STDOUT_FILENO, cstr, strsz );
-
-	expected_bool = false;
-	actual_bool = os.badbit;
+	expected_bool = true;
+	actual_bool = os.good();
 	EXPECT_EQ( expected_bool, actual_bool );
-
-//	os << str;
-//	os.flush();
 }

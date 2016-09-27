@@ -166,8 +166,7 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     void close();
 
-//private:
-protected:
+private:
     filebuf __sb_;
 };
 
@@ -207,8 +206,6 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     filebuf* rdbuf() const;
     _LIBCPP_INLINE_VISIBILITY
-    filebuf* rdbuf( filebuf* __sb );
-    _LIBCPP_INLINE_VISIBILITY
     bool is_open() const;
 #ifndef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE
     void open(const char* __s, std::ios_base::openmode __mode = std::ios_base::out);
@@ -217,8 +214,7 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     void close();
 
-//private:
-protected:
+private:
     filebuf __sb_;
 };
 
@@ -269,8 +265,7 @@ public:
     _LIBCPP_INLINE_VISIBILITY
     void close();
 
-//private:
-protected:
+private:
     filebuf __sb_;
 };
 

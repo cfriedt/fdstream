@@ -36,15 +36,19 @@ BaseTest::~BaseTest()
 
 void BaseTest::SetUp() {
 	SetUpVirt();
+	should_interrupt = true;
 	interrupt_th = thread( interrupt, this );
 }
 
 void BaseTest::TearDown() {
 	TearDownVirt();
+	should_interrupt = false;
 	interrupt_th.join();
 }
 
 void BaseTest::interrupt( BaseTest *siht ) {
 	usleep( siht->interrupt_delay_ms() * 1000 );
-	siht->interrupt_cb();
+	if ( siht->should_interrupt ) {
+		siht->interrupt_cb();
+	}
 }

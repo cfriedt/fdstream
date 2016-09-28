@@ -50,18 +50,65 @@ void usage( const char *progname ) {
 	cout << "note: use Ctrl+C to quit" << endl;
 }
 
+void read_file_descriptor( int fd ) {
+
+	fdstream fds;
+	ios::fmtflags default_fmt;
+
+	fds = fdstream( fd );
+	uint8_t byte;
+
+	default_fmt = cout.flags();
+
+	for( cout.flags( default_fmt ); ; cout.flags( default_fmt ) ) {
+
+		fds >> byte;
+
+		std::cout << "received byte 0x";
+		cout.width( 2 );
+		cout.fill('0');
+		cout << std::hex << (unsigned)byte << std::endl;
+	}
+}
+
+void setup( const char *fn, int *fd ) {
+
+	int r;
+	struct termios config;
+
+	if (
+		false
+		|| -1 == ( r = open( fn, O_RDWR | O_NOCTTY ) )
+		|| -1 == ( *fd = r )
+		|| ! isatty( *fd )
+		|| -1 == tcgetattr( *fd, & config )
+	) {
+		throw std::system_error( errno, std::system_category() );
+	}
+
+	config.c_iflag      &= ~( IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON );
+	config.c_oflag       = 0;
+	config.c_lflag      &= ~( ECHO | ECHONL | ICANON | IEXTEN | ISIG );
+	config.c_cflag      &= ~( CSIZE | PARENB );
+	config.c_cflag      |= CS8;
+	config.c_cc[ VMIN ]  = 1;
+	config.c_cc[ VTIME ] = 0;
+
+	if (
+		false
+		|| -1 == cfsetspeed( &config, B115200 )
+		|| -1 == tcsetattr( *fd, TCSAFLUSH, & config  )
+	) {
+		throw std::system_error( errno, std::system_category() );
+	}
+}
+
 int main( int argc, char *argv[] ) {
 
 	int r;
 
 	char *fn;
 	int fd;
-	fdstream fds;
-	uint8_t byte;
-
-	ios::fmtflags default_fmt;
-
-	struct termios config;
 
 	if ( 2 != argc ) {
 		usage( argv[ 0 ] );
@@ -78,43 +125,8 @@ int main( int argc, char *argv[] ) {
 		fn = argv[ i ];
 	}
 
-	if (
-		false
-		|| -1 == ( r = open( fn, O_RDWR | O_NOCTTY ) )
-		|| -1 == ( fd = r )
-		|| ! isatty( fd )
-		|| -1 == tcgetattr( fd, & config )
-	) {
-		throw std::system_error( errno, std::system_category() );
-	}
-
-	config.c_iflag      &= ~( IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON );
-	config.c_oflag       = 0;
-	config.c_lflag      &= ~( ECHO | ECHONL | ICANON | IEXTEN | ISIG );
-	config.c_cflag      &= ~( CSIZE | PARENB );
-	config.c_cflag      |= CS8;
-	config.c_cc[ VMIN ]  = 1;
-	config.c_cc[ VTIME ] = 0;
-
-	if (
-		false
-		|| -1 == cfsetspeed( &config, B115200 )
-		|| -1 == tcsetattr( fd, TCSAFLUSH, & config  )
-	) {
-		throw std::system_error( errno, std::system_category() );
-	}
-
-	fds = fdstream( fd );
-
-	default_fmt = cout.flags();
-
-	for( cout.flags( default_fmt ); ; cout.flags( default_fmt ) ) {
-		fds >> byte;
-		std::cout << "received byte 0x";
-		cout.width( 2 );
-		cout.fill('0');
-		cout << std::hex << (unsigned)byte << std::endl;
-	}
+	setup( fn, &fd );
+	read_file_descriptor( fd );
 
 	r = EXIT_SUCCESS;
 

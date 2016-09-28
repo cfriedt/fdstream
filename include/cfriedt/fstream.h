@@ -27,8 +27,7 @@
 #define com_github_cfriedt_fstream_
 
 //#include <__config>
-#include <ostream>
-#include <istream>
+#include <iostream>
 //#include <__locale>
 #include <cstdio>
 

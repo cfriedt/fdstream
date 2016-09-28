@@ -55,7 +55,7 @@ public:
 
 	// XXX: @CF: for some reason binary values are not written as binary (for arbitrary FD's) but they are for files
 	// That is a bug that should eventually be fixed. The << overloads are a work-around for that.
-	// XXX: @CF: Also, note, that they use native endianness for multibyte values
+	// XXX: @CF: Also, note, that they use native endianness for multibyte values, also should be configurable.
 
     // 27.7.1.2 Formatted input:
     basic_istream& operator>>(bool& __n) {

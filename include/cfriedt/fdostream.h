@@ -55,8 +55,9 @@ public:
 
 	// XXX: @CF: for some reason binary values are not written as binary (for arbitrary FD's) but they are for files
 	// That is a bug that should eventually be fixed. The << overloads are a work-around for that.
-	// XXX: @CF: Also, note, that they use native endianness for multibyte values
-    // 27.7.2.6 Formatted output:
+	// XXX: @CF: Also, note, that they use native endianness for multibyte values, also should be configurable.
+
+	// 27.7.2.6 Formatted output:
     basic_ostream<char>& operator<<(bool __n) {
     	write( (char *) & __n, sizeof( __n ) );
     	return *this;

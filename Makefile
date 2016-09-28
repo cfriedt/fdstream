@@ -22,6 +22,9 @@
 
 TAG := fdstream
 
+PREFIX ?= /usr/local
+DESTDIR ?=
+
 UNAME := $(shell uname)
 
 ifeq ($(UNAME),Darwin)
@@ -105,7 +108,7 @@ LDLIBS +=
 TEST_LDLIBS :=
 TEST_LDLIBS += -lgtest -lgtest_main 
 
-.PHONY: all clean check
+.PHONY: all clean check install
 
 all: $(LIB) $(LIBTEST) $(TEST_EXE) $(EXAMPLE_EXE)
 
@@ -131,3 +134,11 @@ check: $(TEST_EXE)
 	for i in $^; do \
 		./$$i || true; \
 	done
+
+install: $(LIB) $(INSTHDR) LICENSE README
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib/
+	cp $(LIB) $(DESTDIR)/$(PREFIX)/lib
+	mkdir -p $(DESTDIR)/$(PREFIX)/include/
+	cp -aR $(INCDIR)/* $(DESTDIR)/$(PREFIX)/include/
+	mkdir -p $(DESTDIR)/$(PREFIX)/share/$(TAG)/
+	cp LICENSE README $(DESTDIR)/$(PREFIX)/share/$(TAG)/

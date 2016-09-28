@@ -36,6 +36,10 @@
 #include "cfriedt/fdistream.h"
 #include "BaseTest.h"
 
+#ifndef EOK
+#define EOK 0
+#endif
+
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
@@ -77,7 +81,6 @@ void SocketPairTest::interrupt_cb() {
 	os.interrupt();
 }
 
-/*
 TEST_F( SocketPairTest, PassMessage ) {
 
 	std::string tx_msg = "Hi there!";
@@ -94,7 +97,6 @@ TEST_F( SocketPairTest, PassMessage ) {
 
 	EXPECT_EQ( tx_msg, rx_msg );
 }
-*/
 
 TEST_F( SocketPairTest, PassBinary ) {
 
@@ -105,4 +107,27 @@ TEST_F( SocketPairTest, PassBinary ) {
 	is >> rx_msg;
 
 	EXPECT_EQ( tx_msg, rx_msg );
+}
+
+TEST_F( SocketPairTest, CatchInterrupt ) {
+
+	uint8_t something;
+	std::system_error myerr = std::system_error( EOK, std::system_category() );
+
+	int expected_int;
+	int actual_int;
+
+	try {
+
+		is >> something;
+
+	} catch( const std::system_error& e ) {
+		myerr = e;
+	}
+
+	expected_int = EINTR;
+	actual_int = myerr.code().value();
+
+	EXPECT_EQ( something, 0 );
+	EXPECT_NE( expected_int, actual_int );
 }

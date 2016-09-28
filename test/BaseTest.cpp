@@ -27,6 +27,8 @@
 #include <unistd.h>
 
 BaseTest::BaseTest()
+:
+	should_interrupt( false )
 {
 }
 

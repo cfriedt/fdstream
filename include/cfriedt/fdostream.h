@@ -53,6 +53,67 @@ public:
 		buf.interrupt();
 	}
 
+	// XXX: @CF: for some reason binary values are not written as binary (for arbitrary FD's) but they are for files
+	// That is a bug that should eventually be fixed. The << overloads are a work-around for that.
+	// XXX: @CF: Also, note, that they use native endianness for multibyte values
+    // 27.7.2.6 Formatted output:
+    basic_ostream<char>& operator<<(bool __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(short __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(unsigned short __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(int __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(unsigned int __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(long __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(unsigned long __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(long long __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(unsigned long long __n) {
+    	write( (char *) & __n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(float __f) {
+    	write( (char *) & __f, sizeof( __f ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(double __f) {
+    	write( (char *) & __f, sizeof( __f ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(long double __f) {
+    	write( (char *) & __f, sizeof( __f ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(const void* __p) {
+    	write( (char *) & __p, sizeof( __p ) );
+    	return *this;
+    }
+    basic_ostream<char>& operator<<(const char * __str) {
+    	write( __str, ::strlen( __str ) );
+    	return *this;
+    }
+
 protected:
 	fdstreambuf buf;
 };

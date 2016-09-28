@@ -147,9 +147,9 @@ void fdstreambuf::interrupt() {
 	const uint8_t x = '!';
 
 	r = ::write( sv[ fdstreambuf::INTERRUPTOR ], &x, sizeof( x ) );
-	if ( -1 == r ) {
-		throw std::system_error( errno, std::system_category() );
-	}
+//	if ( -1 == r ) {
+//		throw std::system_error( errno, std::system_category() );
+//	}
 }
 
 int fdstreambuf::get_fd() {

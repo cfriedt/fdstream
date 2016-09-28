@@ -53,6 +53,64 @@ public:
 		buf.interrupt();
 	}
 
+	// XXX: @CF: for some reason binary values are not written as binary (for arbitrary FD's) but they are for files
+	// That is a bug that should eventually be fixed. The << overloads are a work-around for that.
+	// XXX: @CF: Also, note, that they use native endianness for multibyte values
+
+    // 27.7.1.2 Formatted input:
+    basic_istream& operator>>(bool& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(short& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(unsigned short& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(int& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(unsigned int& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(long& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(unsigned long& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(long long& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(unsigned long long& __n) {
+    	read( (char *)&__n, sizeof( __n ) );
+    	return *this;
+    }
+    basic_istream& operator>>(float& __f) {
+    	read( (char *)&__f, sizeof( __f ) );
+    	return *this;
+    }
+    basic_istream& operator>>(double& __f) {
+    	read( (char *)&__f, sizeof( __f ) );
+    	return *this;
+    }
+    basic_istream& operator>>(long double& __f) {
+    	read( (char *)&__f, sizeof( __f ) );
+    	return *this;
+    }
+    basic_istream& operator>>(void*& __p) {
+    	read( (char *)&__p, sizeof( __p ) );
+    	return *this;
+    }
+
 protected:
 	fdstreambuf buf;
 };

@@ -43,7 +43,10 @@ void BaseTest::SetUp() {
 void BaseTest::TearDown() {
 	TearDownVirt();
 	should_interrupt = false;
-	interrupt_th.join();
+	try {
+		interrupt_th.join();
+	} catch( ... ) {
+	}
 }
 
 void BaseTest::interrupt( BaseTest *siht ) {

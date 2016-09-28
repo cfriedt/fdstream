@@ -59,6 +59,7 @@ public:
 
 void StdInTest::SetUpVirt() {
 	is = fdistream( STDIN_FILENO );
+	is.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 }
 
 void StdInTest::interrupt_cb() {
@@ -76,6 +77,9 @@ TEST_F( StdInTest, CatchInterrupt ) {
 	try {
 
 		is >> something;
+		if ( ! is.good() ) {
+			throw std::system_error( EINVAL, std::system_category() );
+		}
 
 	} catch( const std::system_error& e ) {
 		myerr = e;
@@ -85,5 +89,5 @@ TEST_F( StdInTest, CatchInterrupt ) {
 	actual_int = myerr.code().value();
 
 	EXPECT_EQ( something, "" );
-	EXPECT_NE( expected_int, actual_int );
+	EXPECT_EQ( expected_int, actual_int );
 }

@@ -78,7 +78,9 @@ void SocketPairTest::SetUpVirt() {
 
 void SocketPairTest::interrupt_cb() {
 	is.interrupt();
+	is.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 	os.interrupt();
+	os.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 }
 
 TEST_F( SocketPairTest, PassMessage ) {
@@ -90,9 +92,12 @@ TEST_F( SocketPairTest, PassMessage ) {
 	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
 
 	os << tx_msg << std::flush;
-	// Note, std::string overloads the >> operator and tokenizes string
-	// input by default, which is why is.read() must be used instead
-	is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
+	try {
+		// Note, std::string overloads the >> operator and tokenizes string
+		// input by default, which is why is.read() must be used instead
+		is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
+	} catch( ... ) {
+	}
 	rx_msg = std::string( rx_msg_buf );
 
 	EXPECT_EQ( tx_msg, rx_msg );
@@ -111,7 +116,7 @@ TEST_F( SocketPairTest, PassBinary ) {
 
 TEST_F( SocketPairTest, CatchInterrupt ) {
 
-	uint8_t something;
+	std::string something;
 	std::system_error myerr = std::system_error( EOK, std::system_category() );
 
 	int expected_int;
@@ -120,6 +125,9 @@ TEST_F( SocketPairTest, CatchInterrupt ) {
 	try {
 
 		is >> something;
+		if ( ! is.good() ) {
+			throw std::system_error( EINVAL, std::system_category() );
+		}
 
 	} catch( const std::system_error& e ) {
 		myerr = e;
@@ -128,6 +136,6 @@ TEST_F( SocketPairTest, CatchInterrupt ) {
 	expected_int = EINTR;
 	actual_int = myerr.code().value();
 
-	EXPECT_EQ( something, 0 );
-	EXPECT_NE( expected_int, actual_int );
+	EXPECT_EQ( something, "" );
+	EXPECT_EQ( expected_int, actual_int );
 }

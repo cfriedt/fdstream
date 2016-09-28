@@ -35,7 +35,7 @@ namespace cfriedt {
 class fdstream : public ::com::github::cfriedt::fstream {
 
 public:
-	fdstream( int fd = -1, std::ios::openmode mode = std::ios::out )
+	fdstream( int fd = -1, std::ios::openmode mode = std::ios::in | std::ios::out )
 	:
 		fstream( & buf ),
 		buf( fd, mode )

@@ -100,7 +100,7 @@ LDFLAGS :=
 LDFLAGS += -O0
 
 LDLIBS :=
-LDLIBS += /usr/local/llvm/lib/libc++.dylib
+LDLIBS +=
 
 TEST_LDLIBS :=
 TEST_LDLIBS += -lgtest -lgtest_main 

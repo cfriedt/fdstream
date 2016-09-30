@@ -83,33 +83,44 @@ void SocketPairTest::interrupt_cb() {
 	os.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 }
 
-TEST_F( SocketPairTest, PassMessage ) {
+TEST_F( SocketPairTest, SocketPairOK ) {
 
 	std::string tx_msg = "Hi there!";
 	char rx_msg_buf[ 64 ];
 	std::string rx_msg;
+	int r;
+
+	fd_set rfds;
+	struct timeval timeout;
 
 	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
 
-	os << tx_msg << std::flush;
-	try {
-		// Note, std::string overloads the >> operator and tokenizes string
-		// input by default, which is why is.read() must be used instead
-		is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
-	} catch( ... ) {
+	r = ::write( sv[ CLIENT ], tx_msg.c_str(), tx_msg.length() );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+
+	FD_ZERO( & rfds );
+	FD_SET( sv[ SERVER ], & rfds );
+	timeout.tv_sec = interrupt_delay_ms() / 1000;
+	timeout.tv_usec = ( interrupt_delay_ms() % 1000 ) * 1000;
+	r = select( sv[ SERVER ] + 1, & rfds, NULL, NULL, & timeout );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+
+	EXPECT_NE( 0, r );
+	EXPECT_NE( 0, FD_ISSET( sv[ SERVER ], & rfds ) );
+
+	if ( 0 != r ) {
+
+		r = ::read( sv[ SERVER ], rx_msg_buf, sizeof( rx_msg_buf ) );
+		if ( -1 == r ) {
+			throw std::system_error( errno, std::system_category() );
+		}
+
 	}
 	rx_msg = std::string( rx_msg_buf );
-
-	EXPECT_EQ( tx_msg, rx_msg );
-}
-
-TEST_F( SocketPairTest, PassBinary ) {
-
-	uint16_t tx_msg = 0x7e57;
-	uint16_t rx_msg;
-
-	os << tx_msg << std::flush;
-	is >> rx_msg;
 
 	EXPECT_EQ( tx_msg, rx_msg );
 }
@@ -139,3 +150,125 @@ TEST_F( SocketPairTest, CatchInterrupt ) {
 	EXPECT_EQ( something, "" );
 	EXPECT_EQ( expected_int, actual_int );
 }
+
+TEST_F( SocketPairTest, IStreamOK ) {
+
+	std::string tx_msg = "Hi there!";
+	char rx_msg_buf[ 64 ];
+	std::string rx_msg;
+	int r;
+	streamsize expected_streamsize;
+	streamsize actual_streamsize;
+
+	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
+
+	r = ::write( sv[ CLIENT ], tx_msg.c_str(), tx_msg.length() );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+
+	is.unsetf( ios::skipws );
+
+	expected_streamsize = tx_msg.length();
+	actual_streamsize = is.readsome( rx_msg_buf, sizeof( rx_msg_buf ) );
+	EXPECT_EQ( expected_streamsize, actual_streamsize );
+
+	rx_msg = std::string( rx_msg_buf );
+	EXPECT_EQ( tx_msg, rx_msg );
+}
+
+TEST_F( SocketPairTest, IStreamByteByByteOK ) {
+
+	std::string tx_msg = "Hi there!";
+	char rx_msg_buf[ 64 ];
+	std::string rx_msg;
+	int r;
+
+	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
+
+	r = ::write( sv[ CLIENT ], tx_msg.c_str(), tx_msg.length() );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+
+	is.unsetf( ios::skipws );
+
+	for( int i = 0; i < tx_msg.length(); i++ ) {
+		//std::cout << "reading character " << i << std::endl;
+		is >> rx_msg_buf[ i ];
+		//should_interrupt = false;
+		//std::cout << "read char '" << (char)rx_msg_buf[ i ] << "'" << std::endl;
+	}
+
+	rx_msg = std::string( rx_msg_buf );
+	EXPECT_EQ( tx_msg, rx_msg );
+}
+
+TEST_F( SocketPairTest, OStreamOK ) {
+
+	std::string tx_msg = "Hi there!";
+	char rx_msg_buf[ 64 ];
+	std::string rx_msg;
+	int r;
+
+	fd_set rfds;
+	struct timeval timeout;
+
+	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
+
+	os << tx_msg << std::flush;
+
+	FD_ZERO( & rfds );
+	FD_SET( sv[ SERVER ], & rfds );
+	timeout.tv_sec = interrupt_delay_ms() / 1000;
+	timeout.tv_usec = ( interrupt_delay_ms() % 1000 ) * 1000;
+	r = select( sv[ SERVER ] + 1, & rfds, NULL, NULL, & timeout );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+
+	EXPECT_NE( 0, r );
+	EXPECT_NE( 0, FD_ISSET( sv[ SERVER ], & rfds ) );
+
+	if ( 0 != r ) {
+
+		r = ::read( sv[ SERVER ], rx_msg_buf, sizeof( rx_msg_buf ) );
+		if ( -1 == r ) {
+			throw std::system_error( errno, std::system_category() );
+		}
+
+	}
+	rx_msg = std::string( rx_msg_buf );
+
+	EXPECT_EQ( tx_msg, rx_msg );
+}
+
+TEST_F( SocketPairTest, PassBinary ) {
+
+	uint16_t tx_msg = 0x7e57;
+	uint16_t rx_msg;
+
+	os << tx_msg << std::flush;
+	is >> rx_msg;
+
+	EXPECT_EQ( tx_msg, rx_msg );
+}
+
+TEST_F( SocketPairTest, PassMessage ) {
+
+	std::string tx_msg = "Hi there!";
+	char rx_msg_buf[ 64 ];
+	std::string rx_msg;
+
+	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
+
+	os << tx_msg << std::flush;
+	// Note, std::string overloads the >> operator and tokenizes string
+	// input by default, which is why is.read() must be used instead
+	is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
+	rx_msg = std::string( rx_msg_buf );
+
+	EXPECT_EQ( tx_msg, rx_msg );
+}
+
+

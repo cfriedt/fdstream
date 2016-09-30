@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-#include <cfriedt/fstream.h>
 #include <cstdio>
 #include <thread>
 
@@ -83,7 +82,6 @@ void SocketPairTest::interrupt_cb() {
 	os.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 }
 
-/*
 TEST_F( SocketPairTest, SocketPairOK ) {
 
 	std::string tx_msg = "Hi there!";
@@ -151,7 +149,6 @@ TEST_F( SocketPairTest, CatchInterrupt ) {
 	EXPECT_EQ( something, "" );
 	EXPECT_EQ( expected_int, actual_int );
 }
-*/
 
 TEST_F( SocketPairTest, IStreamOK ) {
 
@@ -181,7 +178,6 @@ TEST_F( SocketPairTest, IStreamOK ) {
 	EXPECT_EQ( tx_msg, rx_msg );
 }
 
-/*
 TEST_F( SocketPairTest, IStreamByteByByteOK ) {
 
 	std::string tx_msg = "Hi there!";
@@ -264,15 +260,18 @@ TEST_F( SocketPairTest, PassMessage ) {
 	std::string tx_msg = "Hi there!";
 	char rx_msg_buf[ 64 ];
 	std::string rx_msg;
+	std::streamsize expected_streamsize;
+	std::streamsize actual_streamsize;
 
 	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
 
 	os << tx_msg << std::flush;
-	// Note, std::string overloads the >> operator and tokenizes string
-	// input by default, which is why is.read() must be used instead
-	is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
-	rx_msg = std::string( rx_msg_buf );
 
+	expected_streamsize = tx_msg.length();
+	actual_streamsize = is.readsome( rx_msg_buf, sizeof( rx_msg_buf ) );
+	EXPECT_EQ( expected_streamsize, actual_streamsize );
+
+	rx_msg = std::string( rx_msg_buf );
 	EXPECT_EQ( tx_msg, rx_msg );
 }
-*/
+

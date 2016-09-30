@@ -25,37 +25,35 @@
 #ifndef com_github_cfriedt_fdostream_h_
 #define com_github_cfriedt_fdostream_h_
 
+#include <ostream>
+
 #include "cfriedt/fdstreambuf.h"
-#include "fstream.h"
 
 namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdostream : public ::com::github::cfriedt::ofstream {
+class fdostream : public ::std::ostream {
 
 public:
-	fdostream( int fd = -1, std::ios_base::openmode mode = std::ios_base::out )
+	fdostream( int fd = -1 )
 	:
-		ofstream( & buf ),
-		buf( fd, mode )
+		::std::ostream( 0 ),
+		buf( fd )
 	{
+		rdbuf( & buf );
 	}
 	virtual ~fdostream() {}
 
 	fdostream & operator=( fdostream && __rhs ) {
-		ofstream::operator=( std::move( __rhs ) );
-		buf.swap( __rhs.buf );
+		::std::ostream::swap( __rhs );
+		buf = std::move( __rhs.buf );
 		return *this;
 	}
 
 	void interrupt() {
 		buf.interrupt();
 	}
-
-	// XXX: @CF: for some reason binary values are not written as binary (for arbitrary FD's) but they are for files
-	// That is a bug that should eventually be fixed. The << overloads are a work-around for that.
-	// XXX: @CF: Also, note, that they use native endianness for multibyte values, also should be configurable.
 
 	// 27.7.2.6 Formatted output:
     basic_ostream<char>& operator<<(bool __n) {

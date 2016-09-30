@@ -83,6 +83,7 @@ void SocketPairTest::interrupt_cb() {
 	os.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 }
 
+/*
 TEST_F( SocketPairTest, SocketPairOK ) {
 
 	std::string tx_msg = "Hi there!";
@@ -150,6 +151,7 @@ TEST_F( SocketPairTest, CatchInterrupt ) {
 	EXPECT_EQ( something, "" );
 	EXPECT_EQ( expected_int, actual_int );
 }
+*/
 
 TEST_F( SocketPairTest, IStreamOK ) {
 
@@ -170,13 +172,16 @@ TEST_F( SocketPairTest, IStreamOK ) {
 	is.unsetf( ios::skipws );
 
 	expected_streamsize = tx_msg.length();
+//	is >> rx_msg_buf;
 	actual_streamsize = is.readsome( rx_msg_buf, sizeof( rx_msg_buf ) );
+//	is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
 	EXPECT_EQ( expected_streamsize, actual_streamsize );
 
 	rx_msg = std::string( rx_msg_buf );
 	EXPECT_EQ( tx_msg, rx_msg );
 }
 
+/*
 TEST_F( SocketPairTest, IStreamByteByByteOK ) {
 
 	std::string tx_msg = "Hi there!";
@@ -270,5 +275,4 @@ TEST_F( SocketPairTest, PassMessage ) {
 
 	EXPECT_EQ( tx_msg, rx_msg );
 }
-
-
+*/

@@ -25,39 +25,57 @@
 #ifndef com_github_cfriedt_fdstreambuf_h_
 #define com_github_cfriedt_fdstreambuf_h_
 
+#include <streambuf>
 #include <vector>
-
-#include "cfriedt/fstream.h"
 
 namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdstreambuf : public ::com::github::cfriedt::filebuf {
+class fdstreambuf : public ::std::streambuf {
 
 public:
-	fdstreambuf( int fd = -1, std::ios::openmode mode = std::ios::in | std::ios::out, std::streamsize buffer_size = 256 );
+	fdstreambuf( int fd = -1, std::streamsize input_buffer_size = 256, std::streamsize output_buffer_size = 256, std::streamsize put_back_size = 16 );
+
 	virtual ~fdstreambuf();
+
+	fdstreambuf( const fdstreambuf & other );
+	fdstreambuf( fdstreambuf && other ) noexcept;
+
+	fdstreambuf & operator=( const fdstreambuf & other );
+	fdstreambuf & operator=( fdstreambuf && other );
+
+	void swap( fdstreambuf & other );
+
+	// 27.6.2.4.2 Buffer management and positioning:
+	int sync();
+
+    // 27.6.2.4.3 Get area:
+	std::streamsize showmanyc();
+	int_type underflow();
+
+    // 27.6.2.4.5 Put area
+	int_type overflow( int_type ch = traits_type::eof() );
 
 	void interrupt();
 	int get_fd();
 
-	void swap( fdstreambuf & __rhs );
-
-	int_type underflow();
-	int sync();
-
 protected:
 
+	int fd;
+    const std::streamsize put_back_size;
+    std::vector<char> ibuffer;
+    std::vector<char> obuffer;
+
+    void setup_interrupt_fds();
+    void close_interrupt_fds();
+
+private:
 	enum {
 		INTERRUPTEE,
 		INTERRUPTOR,
 	};
-
     int sv[ 2 ] = { -1, -1, };
-
-    void setup_interrupt_fds();
-    void close_interrupt_fds();
 };
 
 }

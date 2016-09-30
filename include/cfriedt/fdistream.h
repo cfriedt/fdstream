@@ -26,25 +26,29 @@
 #define com_github_cfriedt_fdistream_h_
 
 #include "cfriedt/fdstreambuf.h"
-#include "fstream.h"
+
+#include <istream>
+
+#include "cfriedt/fdstreambuf.h"
 
 namespace com {
 namespace github {
 namespace cfriedt {
 
-class fdistream : public ::com::github::cfriedt::ifstream {
+class fdistream : public ::std::istream {
 
 public:
-	fdistream( int fd = -1, std::ios::openmode mode = std::ios::out )
+	fdistream( int fd = -1 )
 	:
-		ifstream( & buf ),
-		buf( fd, mode )
+		::std::istream( 0 ),
+		buf( fd )
 	{
+		rdbuf( & buf );
 	}
 	virtual ~fdistream() {}
 
 	fdistream & operator=( fdistream && __rhs ) {
-		ifstream::operator=( std::move( __rhs ) );
+		::std::istream::swap( __rhs );
 		buf.swap( __rhs.buf );
 		return *this;
 	}
@@ -52,10 +56,6 @@ public:
 	void interrupt() {
 		buf.interrupt();
 	}
-
-	// XXX: @CF: for some reason binary values are not written as binary (for arbitrary FD's) but they are for files
-	// That is a bug that should eventually be fixed. The << overloads are a work-around for that.
-	// XXX: @CF: Also, note, that they use native endianness for multibyte values, also should be configurable.
 
     // 27.7.1.2 Formatted input:
     basic_istream& operator>>(bool& __n) {

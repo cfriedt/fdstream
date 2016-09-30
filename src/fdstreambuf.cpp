@@ -22,36 +22,87 @@
  * SOFTWARE.
  */
 
-#include <cfriedt/fstream.h>
-#include "cfriedt/fdstreambuf.h"
-
+#include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 
-using ::com::github::cfriedt::filebuf;
+#include <streambuf>
+
+#include "cfriedt/fdstreambuf.h"
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
 
-fdstreambuf::fdstreambuf( int fd, std::ios_base::openmode mode, std::streamsize buffer_size  )
+fdstreambuf::fdstreambuf( int fd, std::streamsize input_buffer_size, std::streamsize output_buffer_size, std::streamsize put_back_size )
 :
-	filebuf( fd, mode )
+	fd( fd ),
+	put_back_size( std::max( put_back_size, std::streamsize( 1 ) ) ),
+	ibuffer( std::max( input_buffer_size, std::streamsize( 1 ) ) ),
+	obuffer( output_buffer_size + 1 ) // +1 means obuffer.size() >= 1, makes overflow easier
 {
-	setbuf( 0, buffer_size );
+	char *base;
+	base = & obuffer.front();
+	setp( base, base + obuffer.size() - 1 ); // see above comment
 }
 
-fdstreambuf::~fdstreambuf() {
+fdstreambuf::~fdstreambuf()
+{
 	close_interrupt_fds();
 }
 
-void fdstreambuf::swap( fdstreambuf & __rhs ) {
-    filebuf::swap( __rhs );
+fdstreambuf::fdstreambuf( const fdstreambuf & other )
+:
+	fd( other.fd ),
+	put_back_size( other.put_back_size ),
+	ibuffer( other.ibuffer ),
+	obuffer( other.obuffer )
+{
+}
+fdstreambuf::fdstreambuf( fdstreambuf && other ) noexcept
+:
+	fd( std::move( other.fd ) ),
+	put_back_size( std::move( other.put_back_size ) ),
+	ibuffer( std::move( other.ibuffer ) ),
+	obuffer( std::move( other.obuffer ) )
+{
 }
 
-int fdstreambuf::sync() {
+fdstreambuf & fdstreambuf::operator=( const fdstreambuf & other )
+{
+	fdstreambuf tmp( other );
+	*this = std::move( tmp );
+	return *this;
+}
+fdstreambuf & fdstreambuf::operator=( fdstreambuf && other )
+{
+	swap( other );
+	return *this;
+}
 
+void fdstreambuf::swap( fdstreambuf & other ) {
+	::std::streambuf::swap( other );
+	fd = std::move( other.fd );
+
+	std::streamsize tmp;
+	tmp = other.put_back_size;
+	*( (std::streamsize *) & other.put_back_size ) = put_back_size;
+	*( (std::streamsize *) & put_back_size ) = tmp;
+
+	ibuffer = std::move( other.ibuffer );
+	obuffer = std::move( other.obuffer );
+}
+
+
+int fdstreambuf::sync()
+{
 	int r;
+
+	const int max_tries = 10;
+	int tries;
+	char *ch;
+	int nw;
 
 	fd_set rfds;
 	fd_set wfds;
@@ -60,54 +111,100 @@ int fdstreambuf::sync() {
     int fd;
 
     n = pptr() - pbase();
-
     if ( 0 == n ) {
-    	r = EXIT_SUCCESS;
+    	// e.g. if this is a read-only buffer or if it is empty
+    	return 0;
     }
 
     fd = get_fd();
 
     setup_interrupt_fds();
 
-    FD_ZERO( & rfds );
-    FD_SET( sv[ fdstreambuf::INTERRUPTEE ], & rfds );
+	for( ch = pbase(), nw = 0, tries = 0; n > 0 && tries < max_tries; ch += nw, n -= nw, tries++ ) {
 
-    FD_ZERO( & rfds );
-    FD_SET( fd, & wfds );
+		FD_ZERO( & rfds );
+		FD_SET( sv[ fdstreambuf::INTERRUPTEE ], & rfds );
 
-    nfds = ::max( fd, sv[ fdstreambuf::INTERRUPTEE ] ) + 1;
+		FD_ZERO( & rfds );
+		FD_SET( fd, & wfds );
 
-    r = ::select( nfds, & rfds, & wfds, NULL, NULL );
+		nfds = ::max( fd, sv[ fdstreambuf::INTERRUPTEE ] ) + 1;
+
+		r = ::select( nfds, & rfds, & wfds, NULL, NULL );
 rethrow:
-	if ( -1 == r ) {
-		throw std::system_error( errno, std::system_category() );
-	}
-	if ( 0 == r ) {
-		errno = EAGAIN;
-		r = -1;
-		goto rethrow;
-	}
-	if ( FD_ISSET( sv[ fdstreambuf::INTERRUPTEE ], & rfds ) ) {
-		errno = EINTR;
-		r = -1;
-		goto rethrow;
-	}
-	if ( ! FD_ISSET( fd, & wfds ) ) {
-		errno = EAGAIN;
-		r = -1;
-		goto rethrow;
+		if ( -1 == r ) {
+			throw std::system_error( errno, std::system_category() );
+		}
+		if ( 0 == r ) {
+			errno = EAGAIN;
+			r = -1;
+			goto rethrow;
+		}
+		if ( FD_ISSET( sv[ fdstreambuf::INTERRUPTEE ], & rfds ) ) {
+			errno = EINTR;
+			r = -1;
+			goto rethrow;
+		}
+		if ( ! FD_ISSET( fd, & wfds ) ) {
+			errno = EAGAIN;
+			r = -1;
+			goto rethrow;
+		}
+
+		r = ::write( fd, ch, n );
+		if ( -1 == r ) {
+			throw std::system_error( errno, std::system_category() );
+		}
+
+		nw = r;
 	}
 
-	return filebuf::sync();
+	return 0;
 }
 
+std::streamsize fdstreambuf::showmanyc() {
+	std::streamsize r;
 
-int fdstreambuf::underflow() {
+	int rr;
+	int fd;
+	int nread;
+
+	nread = 0;
+	fd = get_fd();
+
+	rr = ::ioctl( fd, FIONREAD, & nread );
+	if ( -1 == rr ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+
+	r = nread;
+
+	return r;
+}
+
+fdstreambuf::int_type fdstreambuf::underflow()
+{
 	int r;
+
 	int nfds;
 	fd_set rfds;
-
+	char *base;
+	char *start;
 	int fd;
+
+	if ( gptr() < egptr() ) {
+		// buffer not exhausted
+		return traits_type::to_int_type(*gptr());
+	}
+
+	base = & ibuffer.front();
+	start = base;
+
+	if ( eback() == base ) {
+		// not the first fill. ensure there is room for the put back characters
+		std::memmove( base, egptr() - put_back_size, put_back_size );
+		start += put_back_size;
+	}
 
 	fd = get_fd();
 	setup_interrupt_fds();
@@ -123,9 +220,12 @@ rethrow:
 		throw std::system_error( errno, std::system_category() );
 	}
 	if ( 0 == r ) {
-		errno = EAGAIN;
-		r = -1;
-		goto rethrow;
+		// timeout occurred (even though we did not specify one)
+		// might be because file was opened non-blocking
+		return traits_type::eof();
+		//		errno = EAGAIN;
+		//		r = -1;
+		//		goto rethrow;
 	}
 	if ( FD_ISSET( sv[ fdstreambuf::INTERRUPTEE ], & rfds ) ) {
 		errno = EINTR;
@@ -133,27 +233,52 @@ rethrow:
 		goto rethrow;
 	}
 	if ( ! FD_ISSET( fd, & rfds ) ) {
-		errno = EAGAIN;
-		r = -1;
-		goto rethrow;
+		return traits_type::eof();
+//		errno = EAGAIN;
+//		r = -1;
+//		goto rethrow;
 	}
 
-	return filebuf::underflow();
+	r = ::read( fd, start, ibuffer.size() - ( start - base ) );
+	switch( r ) {
+	case -1:
+		throw std::system_error( errno, std::system_category() );
+		break;
+	case 0:
+		return traits_type::eof();
+		break;
+	default:
+		break;
+	}
+
+	setg( base, start, start + r );
+	return traits_type::to_int_type( *gptr() );
 }
 
+fdstreambuf::int_type fdstreambuf::overflow( int_type ch )
+{
+	if ( traits_type::eof() != ch ) {
+		*pptr() = ch;
+		pbump( 1 );
+		if ( 0 == sync() ) {
+			// successful
+			return ch;
+		}
+	}
 
-void fdstreambuf::interrupt() {
-	int r;
-	const uint8_t x = '!';
+	return traits_type::eof();
+}
 
-	r = ::write( sv[ fdstreambuf::INTERRUPTOR ], &x, sizeof( x ) );
-//	if ( -1 == r ) {
-//		throw std::system_error( errno, std::system_category() );
-//	}
+void fdstreambuf::interrupt()
+{
+	const char msg = '!';
+	if ( -1 == ::write( sv[ INTERRUPTOR ], & msg, sizeof( msg ) ) ) {
+		//throw std::system_error( errno, std::system_category() );
+	}
 }
 
 int fdstreambuf::get_fd() {
-	return __file_fd_;
+	return fd;
 }
 
 void fdstreambuf::setup_interrupt_fds() {

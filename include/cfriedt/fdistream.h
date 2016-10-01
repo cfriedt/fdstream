@@ -38,10 +38,10 @@ namespace cfriedt {
 class fdistream : public ::std::istream {
 
 public:
-	fdistream( int fd = -1 )
+	fdistream( int fd = -1, std::streamsize buffer_size = 256, std::streamsize put_back_size = 16 )
 	:
 		::std::istream( 0 ),
-		buf( fd )
+		buf( fd, buffer_size, 0, put_back_size )
 	{
 		rdbuf( & buf );
 	}
@@ -62,6 +62,14 @@ public:
     	read( (char *)&__n, sizeof( __n ) );
     	return *this;
     }
+	basic_istream& operator>>(char& __n) {
+		read( (char *)&__n, sizeof( __n ) );
+		return *this;
+	}
+	basic_istream& operator>>(unsigned char& __n) {
+		read( (char *)&__n, sizeof( __n ) );
+		return *this;
+	}
     basic_istream& operator>>(short& __n) {
     	read( (char *)&__n, sizeof( __n ) );
     	return *this;

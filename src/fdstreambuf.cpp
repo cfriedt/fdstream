@@ -281,6 +281,18 @@ int fdstreambuf::get_fd() {
 	return fd;
 }
 
+std::streamsize fdstreambuf::getInputBufferSize() {
+	return ibuffer.size();
+}
+
+std::streamsize fdstreambuf::getOutputBufferSize() {
+	return obuffer.size() - 1;
+}
+
+std::streamsize fdstreambuf::getPutbackSize() {
+	return put_back_size;
+}
+
 void fdstreambuf::setup_interrupt_fds() {
 	int r;
 	int nclosed;

@@ -60,6 +60,10 @@ public:
 	void interrupt();
 	int get_fd();
 
+	std::streamsize getInputBufferSize();
+	std::streamsize getOutputBufferSize();
+	std::streamsize getPutbackSize();
+
 protected:
 
 	int fd;

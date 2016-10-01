@@ -72,14 +72,14 @@ void SocketPairTest::SetUpVirt() {
 	}
 
 	os = fdostream( sv[ CLIENT ] );
+	os.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 	is = fdistream( sv[ SERVER ] );
+	is.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 }
 
 void SocketPairTest::interrupt_cb() {
 	is.interrupt();
-	is.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 	os.interrupt();
-	os.exceptions( ios::badbit | ios::eofbit | ios::failbit );
 }
 
 TEST_F( SocketPairTest, SocketPairOK ) {
@@ -275,3 +275,119 @@ TEST_F( SocketPairTest, PassMessage ) {
 	EXPECT_EQ( tx_msg, rx_msg );
 }
 
+TEST_F( SocketPairTest, PutBackMessage ) {
+
+	std::string tx_msg = "Hi there!";
+	char rx_msg_buf[ 64 ];
+	std::string rx_msg;
+	int r;
+	std::streamsize expected_streamsize;
+	std::streamsize actual_streamsize;
+
+	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
+
+	r = ::write( sv[ CLIENT ], tx_msg.c_str(), tx_msg.length() );
+	if ( -1 == r ) {
+		throw std::system_error( errno, std::system_category() );
+	}
+
+	is.unsetf( ios::skipws );
+
+	expected_streamsize = tx_msg.length();
+//	is >> rx_msg_buf;
+	actual_streamsize = is.readsome( rx_msg_buf, sizeof( rx_msg_buf ) );
+//	is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
+	EXPECT_EQ( expected_streamsize, actual_streamsize );
+
+	rx_msg = std::string( rx_msg_buf );
+	EXPECT_EQ( tx_msg, rx_msg );
+
+	for( int i = rx_msg.length() - 1; i >= 0; i-- ) {
+		is.putback( rx_msg_buf[ i ] );
+	}
+
+	memset( rx_msg_buf, 0, sizeof( rx_msg_buf ) );
+
+	expected_streamsize = tx_msg.length();
+//	is >> rx_msg_buf;
+	actual_streamsize = is.readsome( rx_msg_buf, sizeof( rx_msg_buf ) );
+//	is.read( rx_msg_buf, sizeof( rx_msg_buf ) );
+	EXPECT_EQ( expected_streamsize, actual_streamsize );
+
+}
+
+TEST_F( SocketPairTest, PutBackFail ) {
+
+	std::string expected_string;
+	std::string actual_string;
+
+	uint8_t expected_uint8_t;
+	uint8_t actual_uint8_t;
+
+	expected_uint8_t = 'a';
+
+	os << (int)expected_uint8_t << std::flush;
+	is >> actual_uint8_t;
+	EXPECT_EQ( expected_uint8_t, actual_uint8_t );
+
+	expected_string = std::string( "" );
+	actual_string.clear();
+	try {
+		is.unget();
+	} catch( std::exception &e ) {
+		actual_string = std::string( e.what() );
+	}
+	EXPECT_EQ( expected_string, actual_string );
+
+	expected_string = std::string( "" );
+	actual_string.clear();
+	try {
+		is.unget();
+	} catch( std::exception &e ) {
+		actual_string = std::string( e.what() );
+	}
+	EXPECT_NE( expected_string, actual_string );
+}
+
+TEST_F( SocketPairTest, PutBackLimit ) {
+
+	std::string expected_string;
+	std::string actual_string;
+
+	uint8_t expected_uint8_t;
+	uint8_t actual_uint8_t;
+
+	std::streamsize put_back_size = 2;
+
+	expected_uint8_t = 'a';
+
+	for( int i = 0; i < put_back_size; i++ ) {
+		os << expected_uint8_t;
+	}
+	os.flush();
+
+	for( int i = 0; i < put_back_size; i++ ) {
+		is >> actual_uint8_t;
+		EXPECT_EQ( expected_uint8_t, actual_uint8_t );
+	}
+
+	expected_string = std::string( "" );
+	actual_string.clear();
+	try {
+		for( int i = 0; i < put_back_size; i++ ) {
+			is.unget();
+		}
+	} catch( std::exception &e ) {
+		actual_string = std::string( e.what() );
+	}
+	EXPECT_EQ( expected_string, actual_string );
+
+	expected_string = std::string( "" );
+	actual_string.clear();
+	try {
+		is.unget();
+	} catch( std::exception &e ) {
+		actual_string = std::string( e.what() );
+	}
+	EXPECT_NE( expected_string, actual_string );
+}

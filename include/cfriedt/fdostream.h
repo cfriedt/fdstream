@@ -36,10 +36,10 @@ namespace cfriedt {
 class fdostream : public ::std::ostream {
 
 public:
-	fdostream( int fd = -1 )
+	fdostream( int fd = -1, std::streamsize buffer_size = 256 )
 	:
 		::std::ostream( 0 ),
-		buf( fd )
+		buf( fd, 0, buffer_size )
 	{
 		rdbuf( & buf );
 	}
@@ -59,6 +59,14 @@ public:
     basic_ostream<char>& operator<<(bool __n) {
     	write( (char *) & __n, sizeof( __n ) );
     	return *this;
+    }
+    basic_ostream<char>& operator<<(char __n) {
+		write( (char *) & __n, sizeof( __n ) );
+		return *this;
+    }
+    basic_ostream<char>& operator<<(unsigned char __n) {
+		write( (char *) & __n, sizeof( __n ) );
+		return *this;
     }
     basic_ostream<char>& operator<<(short __n) {
     	write( (char *) & __n, sizeof( __n ) );

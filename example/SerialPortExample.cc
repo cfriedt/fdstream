@@ -30,11 +30,16 @@
 #include <termios.h>
 
 #include <iostream>
+#include <cstring>
 
 #include "cfriedt/fdstream.h"
+#include "cfriedt/fdistream.h"
 
 using namespace ::std;
 using namespace ::com::github::cfriedt;
+
+// XXX: @CF: can use fdistream or fdstream. either works
+#define ISTYPE fdstream
 
 /*
 XXX: @CF: add some argv[] processing
@@ -44,34 +49,76 @@ XXX: @CF: add some argv[] processing
 #define DEFAULT_STOPBITS 1
 */
 
+#pragma pack(push,1)
+class blob {
+public:
+	static const int len = 9;
+	uint8_t data[ len ];
+
+	uint8_t & operator[]( const int index ) {
+		return data[ index % len ];
+	}
+};
+#pragma pack(pop)
+
+ISTYPE & operator>>( ISTYPE & is, blob & b ) {
+	is.read( (char *) b.data, b.len );
+	return is;
+}
+
+std::ostream & operator<<( std::ostream & os, const std::vector<uint8_t> & vec ) {
+	unsigned c;
+	os << "[";
+	for( int i = 0; i < vec.size(); i++ ) {
+		if ( 0 == i ) {
+			os << " ";
+		}
+		c = vec[ i ];
+		os << std::hex << c;
+		if ( i < vec.size() - 1 ) {
+			os << ",";
+		}
+		os << " ";
+	}
+	os << "]";
+	return os;
+}
+
 void usage( const char *progname ) {
 	cout << "usage: " << progname << " /dev/ttyX" << endl;
 	cout << endl;
 	cout << "note: use Ctrl+C to quit" << endl;
 }
 
-void read_file_descriptor( int fd ) {
+void read_file_descriptor( ISTYPE &fds ) {
 
-	fdstream fds;
-	ios::fmtflags default_fmt;
+	blob blob;
+	std::vector<uint8_t> vec;
 
-	fds = fdstream( fd );
-	uint8_t byte;
+	for(
+		::memset( & blob, 0, sizeof( blob ) )
+		;;
+		::memset( & blob, 0, sizeof( blob ) )
+	) {
 
-	default_fmt = cout.flags();
+		//fds.read( (char *) & blob, sizeof( blob ) );
+		fds >> blob;
 
-	for( cout.flags( default_fmt ); ; cout.flags( default_fmt ) ) {
-
-		fds >> byte;
-
-		std::cout << "received byte 0x";
+		cout.fill( '0' );
 		cout.width( 2 );
-		cout.fill('0');
-		cout << std::hex << (unsigned)byte << std::endl;
+		std::cout << "[ ";
+		for( int i = 0; i < blob::len; i++ ) {
+			std::cout << std::hex << (unsigned) blob.data[ i ];
+			if ( i < blob::len - 1 ) {
+				std::cout << ",";
+			}
+			std::cout << " ";
+		}
+		std::cout << "]" << std::endl;
 	}
 }
 
-void setup( const char *fn, int *fd ) {
+void setup( const char *fn, int *fd, ISTYPE &fds ) {
 
 	int r;
 	struct termios config;
@@ -101,6 +148,10 @@ void setup( const char *fn, int *fd ) {
 	) {
 		throw std::system_error( errno, std::system_category() );
 	}
+
+	fds = ISTYPE( *fd );
+	fds.clear();
+	fds.exceptions( std::ios::badbit | std::ios::failbit | std::ios::eofbit );
 }
 
 int main( int argc, char *argv[] ) {
@@ -109,6 +160,7 @@ int main( int argc, char *argv[] ) {
 
 	char *fn;
 	int fd;
+	ISTYPE fds;
 
 	if ( 2 != argc ) {
 		usage( argv[ 0 ] );
@@ -125,8 +177,8 @@ int main( int argc, char *argv[] ) {
 		fn = argv[ i ];
 	}
 
-	setup( fn, &fd );
-	read_file_descriptor( fd );
+	setup( fn, &fd, fds );
+	read_file_descriptor( fds );
 
 	r = EXIT_SUCCESS;
 

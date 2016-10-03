@@ -42,7 +42,15 @@ fdstreambuf::fdstreambuf( int fd, std::streamsize input_buffer_size, std::stream
 	ibuffer( std::max( input_buffer_size, std::streamsize( 1 ) ) ),
 	obuffer( output_buffer_size + 1 ) // +1 means obuffer.size() >= 1, makes overflow easier
 {
+	// for input buffer
+	char *end;
+
+	// for output buffer
 	char *base;
+
+	end = & ibuffer.front() + ibuffer.size();
+	setg( end, end, end );
+
 	base = & obuffer.front();
 	setp( base, base + obuffer.size() - 1 ); // see above comment
 }
@@ -54,6 +62,7 @@ fdstreambuf::~fdstreambuf()
 
 fdstreambuf::fdstreambuf( const fdstreambuf & other )
 :
+	::std::streambuf( other ),
 	fd( other.fd ),
 	put_back_size( other.put_back_size ),
 	ibuffer( other.ibuffer ),
@@ -62,6 +71,7 @@ fdstreambuf::fdstreambuf( const fdstreambuf & other )
 }
 fdstreambuf::fdstreambuf( fdstreambuf && other ) noexcept
 :
+	::std::streambuf( other ),
 	fd( std::move( other.fd ) ),
 	put_back_size( std::move( other.put_back_size ) ),
 	ibuffer( std::move( other.ibuffer ) ),

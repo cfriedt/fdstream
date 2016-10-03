@@ -60,6 +60,14 @@ public:
     	read( (char *)&__n, sizeof( __n ) );
     	return *this;
     }
+	basic_iostream& operator>>( char& __n ) {
+		read( (char *) & __n, sizeof(__n) );
+		return *this;
+	}
+	basic_iostream& operator>>( unsigned char& __n ) {
+		read( (char *) & __n, sizeof(__n) );
+		return *this;
+	}
     basic_iostream& operator>>(short& __n) {
     	read( (char *)&__n, sizeof( __n ) );
     	return *this;
@@ -114,10 +122,18 @@ public:
     	write( (char *) & __n, sizeof( __n ) );
     	return *this;
     }
-    basic_iostream<char>& operator<<(short __n) {
+    basic_iostream<char>& operator<<(char __n) {
     	write( (char *) & __n, sizeof( __n ) );
     	return *this;
     }
+	basic_iostream<char>& operator<<(unsigned char __n) {
+		write( (char *) & __n, sizeof(__n) );
+		return *this;
+	}
+	basic_iostream<char>& operator<<(short __n) {
+		write( (char *) & __n, sizeof(__n) );
+		return *this;
+	}
     basic_iostream<char>& operator<<(unsigned short __n) {
     	write( (char *) & __n, sizeof( __n ) );
     	return *this;
